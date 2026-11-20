@@ -1,0 +1,7 @@
+# InternTrack runtime dependencies.
+# Exact pins keep every team member on identical versions.
+# Django 5.2 is an LTS release (security support until April 2028).
+
+Django==5.2.19
+psycopg[binary]==3.3.9
+django-environ==0.14.0
