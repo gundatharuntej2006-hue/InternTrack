@@ -221,3 +221,28 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# -----------------------------------------------------------------------------
+# InternTrack project-specific rules
+# -----------------------------------------------------------------------------
+# Environment files: never commit real secrets. Only the example is tracked.
+.env
+.env.*
+!.env.example
+
+# Django generated files
+staticfiles/
+media/
+
+# Local database dumps / data
+# (add database dump file names here if needed)
+*.dump
+pgdata/
+postgres_data/
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
