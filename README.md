@@ -23,6 +23,7 @@ Internship and Training Management System for One University Department.
 11. [Common errors and solutions](#11-common-errors-and-solutions)
 12. [Project structure](#12-project-structure)
 13. [Daily workflow cheat sheet](#13-daily-workflow-cheat-sheet)
+14. [Team Git workflow](#14-team-git-workflow)
 
 **Short on time?** Jump to the [Quick start](#quick-start-tldr).
 
@@ -431,6 +432,115 @@ python manage.py runserver
 # end of the day
 # Ctrl+C to stop the server, then:
 docker compose stop
+```
+
+## 14. Team Git workflow
+
+Every team member has **their own branch**, created from `main`:
+
+| Member | Branch |
+|--------|--------|
+| Tharun | `tharun` |
+| Atul   | `atul` |
+| Ritika | `ritika` |
+| Kiunal | `kiunal` |
+
+**Rules**
+
+1. Never commit or push directly to `main`.
+2. Work and push **only** on your own branch.
+3. Get your changes into `main` through a **pull request (PR)**.
+4. Wait for a review before merging.
+
+### One-time setup (first time only)
+
+Replace `<your-branch>` with your branch from the table (`tharun`, `atul`,
+`ritika` or `kiunal`):
+
+```bash
+git clone https://github.com/gundatharuntej2006-hue/InternTrack.git
+cd InternTrack
+git fetch origin
+git switch --track origin/<your-branch>
+```
+
+Then follow [Quick start](#quick-start-tldr) from the `Copy-Item` / `cp .env.example .env` step.
+
+Copy-paste version per member:
+
+```bash
+# Tharun
+git switch --track origin/tharun
+
+# Atul
+git switch --track origin/atul
+
+# Ritika
+git switch --track origin/ritika
+
+# Kiunal
+git switch --track origin/kiunal
+```
+
+> Already cloned the repo earlier? Skip `git clone` and just run
+> `git fetch origin` followed by your `git switch --track ...` line.
+
+### Every time you start working: bring in the latest `main`
+
+```bash
+git switch <your-branch>        # e.g. git switch atul
+git fetch origin
+git merge origin/main           # bring other members' merged work into your branch
+```
+
+If Git reports a **merge conflict**, open the listed files, keep the correct
+code, then `git add <file>` and `git commit`. Ask the team if unsure.
+
+### Make changes, commit and push
+
+```bash
+git status                      # see what changed
+git add <file1> <file2>         # stage specific files (never .env)
+git commit -m "Short description of what you did"
+git push origin <your-branch>   # e.g. git push origin ritika
+```
+
+> Run `git status` before every commit and check that `.env`, `.venv/`
+> or other local files are **not** listed. `.gitignore` should already
+> exclude them.
+
+### Open a pull request into `main`
+
+**Website:** open
+<https://github.com/gundatharuntej2006-hue/InternTrack/pulls>, click
+**New pull request**, set **base: `main`** ← **compare: `<your-branch>`**,
+describe your change and click **Create pull request**.
+
+**Or with GitHub CLI:**
+
+```bash
+gh pr create --base main --head <your-branch> --title "DT-x: what you did" --body "Details, how you tested it"
+```
+
+Then **wait for a teammate to review**. Merge only after approval, and
+after the tests pass (`python manage.py test`).
+
+### After your PR is merged
+
+```bash
+git switch <your-branch>
+git fetch origin
+git merge origin/main           # keep your branch up to date with main
+```
+
+### Tip: keep your email private
+
+Commits are public in this repository. To avoid publishing your personal
+email, enable **GitHub → Settings → Emails → "Keep my email addresses
+private"**, then set your GitHub no-reply address for this repo:
+
+```bash
+git config user.email "<id>+<username>@users.noreply.github.com"   # shown on that settings page
 ```
 
 ---
