@@ -126,6 +126,8 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+# Project-wide static files (shared CSS for all templates).
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 
 # --- Logging -----------------------------------------------------------------

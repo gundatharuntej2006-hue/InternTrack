@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Placements{% endblock %}
+{% block content %}
+<h1>Placements</h1>
+<form class="filters" method="get">
+  <div class="field"><label><input type="checkbox" name="overdue" value="1" {% if overdue_only %}checked{% endif %} style="width:auto"> Show overdue only</label></div>
+  <button class="btn" type="submit">Apply</button>
+</form>
+{% if placements %}
+<div class="tablewrap">
+<table class="data">
+  <thead><tr><th scope="col">Student</th><th scope="col">Placement</th><th scope="col">Mentor</th><th scope="col">Last check-in</th><th scope="col">Check-ins</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
+  <tbody>
+  {% for p in placements %}
+    <tr>
+      <td>{{ p.student.name }}</td>
+      <td>{{ p.opportunity.title }}</td>
+      <td>{{ p.mentor.name }}</td>
+      <td>{% if p.last_checkin_week %}{{ p.last_checkin_week|date:"j M Y" }}{% else %}None{% endif %}</td>
+      <td>{% if p.is_overdue %}<span class="status status--overdue">Overdue</span>{% else %}On track{% endif %}</td>
+      <td>{% include "includes/status.html" with value=p.state label=p.get_state_display %}</td>
+      <td>{% if p.state == "ACTIVE" and p.last_checkin_week %}
+        <form method="post" action="{% url 'placements:complete' p.pk %}">{% csrf_token %}<button class="btn" type="submit">Mark completed<span class="visually-hidden"> for {{ p.student.name }}</span></button></form>
+      {% endif %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<p class="meta">Overdue means no check-in 7 days after the week ended.</p>
+{% else %}
+<p class="empty">No placements to show.</p>
+{% endif %}
+{% endblock %}

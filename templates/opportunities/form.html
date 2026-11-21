@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{% if opportunity %}Edit opportunity{% else %}New opportunity{% endif %}{% endblock %}
+{% block content %}
+<p><a href="{% url 'opportunities:org_list' %}">&larr; Back to my opportunities</a></p>
+<h1>{% if opportunity %}Edit: {{ opportunity.title }}{% else %}New opportunity{% endif %}</h1>
+{% if opportunity.state == "RETURNED" %}
+<div class="panel"><strong>Returned by coordinator:</strong> {{ opportunity.return_reason }}</div>
+{% endif %}
+<p class="lead">Save as a draft any time. When you submit, the coordinator reviews it before students can see it.</p>
+
+{% include "includes/form_errors.html" with form=form %}
+<form class="stack" method="post" novalidate>
+  {% csrf_token %}
+  {% include "includes/field.html" with field=form.title %}
+  {% include "includes/field.html" with field=form.description %}
+  {% include "includes/field.html" with field=form.eligibility %}
+  <fieldset>
+    <legend>Where</legend>
+    {% include "includes/field.html" with field=form.mode %}
+    {% include "includes/field.html" with field=form.location %}
+  </fieldset>
+  <fieldset>
+    <legend>When</legend>
+    {% include "includes/field.html" with field=form.start_date %}
+    {% include "includes/field.html" with field=form.end_date %}
+    {% include "includes/field.html" with field=form.deadline %}
+  </fieldset>
+  {% include "includes/field.html" with field=form.mentor %}
+  <div class="actions">
+    <button class="btn" type="submit" name="action" value="save">Save draft</button>
+    <button class="btn btn--primary" type="submit" name="action" value="submit">Submit for review</button>
+  </div>
+</form>
+{% endblock %}

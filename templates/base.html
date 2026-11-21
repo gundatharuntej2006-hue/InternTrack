@@ -1,0 +1,49 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}InternTrack{% endblock %} | InternTrack</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+<header class="topbar">
+  <div class="inner">
+    <a class="logo" href="/">InternTrack</a>
+    {% if user.is_authenticated %}
+    <nav class="mainnav" aria-label="Main">
+      <ul>
+        {% if user.role == "STUDENT" %}
+          <li><a href="{% url 'opportunities:list' %}" {% if nav == "opportunities" %}aria-current="page"{% endif %}>Opportunities</a></li>
+          <li><a href="{% url 'applications:my_list' %}" {% if nav == "applications" %}aria-current="page"{% endif %}>My applications</a></li>
+          <li><a href="{% url 'placements:my_placement' %}" {% if nav == "placement" %}aria-current="page"{% endif %}>My placement</a></li>
+        {% elif user.role == "COORDINATOR" %}
+          <li><a href="{% url 'dashboard:queue' %}" {% if nav == "queue" %}aria-current="page"{% endif %}>Needs action</a></li>
+          <li><a href="{% url 'opportunities:review_list' %}" {% if nav == "opportunities" %}aria-current="page"{% endif %}>Opportunities</a></li>
+          <li><a href="{% url 'applications:review_list' %}" {% if nav == "applications" %}aria-current="page"{% endif %}>Applications</a></li>
+          <li><a href="{% url 'placements:list' %}" {% if nav == "placements" %}aria-current="page"{% endif %}>Placements</a></li>
+        {% elif user.role == "ORG_REP" %}
+          <li><a href="{% url 'opportunities:org_list' %}" {% if nav == "opportunities" %}aria-current="page"{% endif %}>My opportunities</a></li>
+          <li><a href="{% url 'placements:mentor_checkins' %}" {% if nav == "checkins" %}aria-current="page"{% endif %}>Check-ins</a></li>
+        {% endif %}
+        <li><a href="{% url 'dashboard:notices' %}" {% if nav == "notices" %}aria-current="page"{% endif %}>Notices{% if notice_count %} <span>({{ notice_count }} unread)</span>{% endif %}</a></li>
+      </ul>
+    </nav>
+    <div class="userbox">
+      <span>{{ user.name }} ({{ user.get_role_display }})</span>
+      <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="linkbtn" type="submit">Sign out</button></form>
+    </div>
+    {% endif %}
+  </div>
+</header>
+<main id="main" tabindex="-1">
+  {% if messages %}
+  <ul class="messages" role="status">
+    {% for message in messages %}<li class="{{ message.tags }}">{{ message }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

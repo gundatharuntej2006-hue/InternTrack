@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InternTrack Wireframes</title>
+<style>
+:root{--ink:#1f2937;--muted:#6b7280;--line:#9ca3af;--fill:#f3f4f6;--fill2:#e5e7eb;--accent:#1b2b45;--bg:#ffffff}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 system-ui,Segoe UI,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+header.top{background:var(--accent);color:#fff;padding:18px 24px}
+header.top h1{margin:0;font-size:20px}
+header.top p{margin:4px 0 0;opacity:.85}
+nav.toc{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--fill2);padding:8px 24px;display:flex;gap:14px;flex-wrap:wrap;z-index:5}
+nav.toc a{color:var(--accent);text-decoration:none;font-weight:600}
+main{max-width:1180px;margin:0 auto;padding:16px}
+h2{color:var(--accent);border-bottom:2px solid var(--accent);padding-bottom:4px;margin-top:36px}
+h3{margin:22px 0 8px}
+.note{color:var(--muted);font-size:13px}
+/* navigation map */
+.lane{border:1px solid var(--fill2);border-radius:8px;padding:12px;margin:10px 0;background:#fafafa}
+.lane b.role{display:block;margin-bottom:8px}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.flow a{border:1.5px solid var(--line);background:#fff;border-radius:6px;padding:6px 10px;text-decoration:none;color:var(--ink)}
+.flow a:hover,.flow a:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 2px #c7d2fe}
+.flow span{color:var(--muted)}
+.demo{counter-reset:s;padding-left:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.demo li a{display:inline-block;border:1.5px dashed var(--accent);border-radius:20px;padding:4px 10px;text-decoration:none;color:var(--accent)}
+/* wireframe frames */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px}
+.screen{border:2px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;scroll-margin-top:60px}
+.screen:target{border-color:var(--accent);box-shadow:0 0 0 4px #c7d2fe}
+.cap{background:var(--fill2);padding:6px 10px;font-weight:700;font-size:12px;display:flex;justify-content:space-between}
+.cap i{font-style:normal;color:var(--muted);font-weight:600}
+.app{padding:10px}
+.bar{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--fill2);padding-bottom:6px;margin-bottom:8px;font-size:12px}
+.bar .logo{font-weight:800}
+.bar .links{color:var(--muted)}
+.box{border:1px solid var(--line);border-radius:6px;padding:8px;margin:6px 0;background:var(--fill)}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.field{border:1px solid var(--line);background:#fff;border-radius:4px;padding:5px 7px;color:var(--muted);font-size:12px;margin:3px 0}
+.field.tall{height:46px}
+.lbl{font-size:11px;font-weight:700;margin-top:6px}
+.btn{display:inline-block;border:1.5px solid var(--ink);border-radius:5px;padding:4px 10px;font-size:12px;font-weight:700;background:#fff;color:var(--ink);text-decoration:none}
+.btn.pri{background:var(--ink);color:#fff}
+.pill{display:inline-block;border:1px solid var(--ink);border-radius:10px;padding:0 7px;font-size:11px;font-weight:700;background:#fff}
+.small{font-size:11px;color:var(--muted)}
+.timeline{border-left:2px solid var(--line);margin:6px 0 6px 6px;padding-left:10px}
+.timeline div{margin:4px 0}
+table.t{width:100%;border-collapse:collapse;font-size:12px}
+table.t td,table.t th{border:1px solid var(--line);padding:4px;text-align:left}
+table.t th{background:var(--fill2)}
+.next{display:block;margin-top:8px;padding:6px;border-top:1px dashed var(--line);font-size:12px}
+.next a{color:var(--accent);font-weight:700}
+.empty{border:1px dashed var(--line);border-radius:6px;padding:8px;text-align:center;color:var(--muted);font-size:12px}
+.err{border:1.5px solid var(--ink);border-left-width:5px;padding:5px 7px;font-size:12px;margin:4px 0;background:#fff}
+@media (max-width:600px){main{padding:10px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>InternTrack - UA-1 Navigation map, wireframes and clickable prototype</h1>
+  <p>Member 3 (UI Design and Architecture) | Low-fidelity, grey-box only | Every screen box and "Next" link is clickable</p>
+</header>
+<nav class="toc">
+  <a href="#map">1. Navigation map</a>
+  <a href="#demo">2. Demo path</a>
+  <a href="#student">3. Student screens</a>
+  <a href="#coord">4. Coordinator screens</a>
+  <a href="#org">5. Org rep / Mentor screens</a>
+  <a href="#rules">6. UI rules</a>
+</nav>
+<main>
+
+<h2 id="map">1. Navigation map</h2>
+<p class="note">One lane per role. Every role signs in on the same login screen and lands on its own home screen. Click a box to jump to its wireframe.</p>
+
+<div class="lane"><b class="role">Student</b>
+  <div class="flow">
+    <a href="#L1">Login</a><span>→</span>
+    <a href="#S1">Opportunity list</a><span>→</span>
+    <a href="#S2">Opportunity detail</a><span>→</span>
+    <a href="#S3">Apply form</a><span>→</span>
+    <a href="#S4">My applications (status timeline)</a><span>→</span>
+    <a href="#S5">My placement + learning goals</a><span>→</span>
+    <a href="#S6">Weekly check-in form</a>
+  </div>
+</div>
+<div class="lane"><b class="role">Coordinator</b>
+  <div class="flow">
+    <a href="#L1">Login</a><span>→</span>
+    <a href="#C1">Needs-action queue (home)</a><span>→</span>
+    <a href="#C2">Pending opportunities</a><span>|</span>
+    <a href="#C3">Applications + recommendations</a><span>→</span>
+    <a href="#C4">Decision form</a><span>|</span>
+    <a href="#C5">Placements + overdue check-ins</a>
+  </div>
+</div>
+<div class="lane"><b class="role">Organization rep / Mentor</b>
+  <div class="flow">
+    <a href="#L1">Login</a><span>→</span>
+    <a href="#O1">My opportunities (home)</a><span>→</span>
+    <a href="#O2">Draft opportunity form</a><span>|</span>
+    <a href="#O3">Applicants + recommend</a><span>|</span>
+    <a href="#O4">Assigned check-ins + feedback</a>
+  </div>
+</div>
+<p class="note">"→" = goes to next screen. "|" = sibling screen reached from the same home/menu. Every screen also has the role's top menu and an in-app notifications link.</p>
+
+<h2 id="demo">2. Main demo path (clickable prototype)</h2>
+<ol class="demo">
+  <li><a href="#O2">1 Rep drafts opportunity</a></li>
+  <li><a href="#C2">2 Coordinator approves</a></li>
+  <li><a href="#S1">3 Student browses</a></li>
+  <li><a href="#S2">4 Opens detail</a></li>
+  <li><a href="#S3">5 Applies</a></li>
+  <li><a href="#O3">6 Rep recommends Select</a></li>
+  <li><a href="#C3">7 Coordinator reviews</a></li>
+  <li><a href="#C4">8 Confirms + learning goals</a></li>
+  <li><a href="#S4">9 Student sees status trail</a></li>
+  <li><a href="#S5">10 Sees placement + goals</a></li>
+  <li><a href="#S6">11 Submits weekly check-in</a></li>
+  <li><a href="#O4">12 Mentor replies</a></li>
+  <li><a href="#C1">13 Queue updates</a></li>
+</ol>
+<p class="note">Alternate path for the demo: duplicate or late application is rejected (see error state on <a href="#S3">Apply form</a>).</p>
+
+<h2>Shared screen</h2>
+<div class="grid">
+  <section class="screen" id="L1"><div class="cap">L1 Login <i>all roles</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">Department of ___</span></div>
+    <div class="lbl">University email</div><div class="field">name@university.edu</div>
+    <div class="lbl">Password</div><div class="field">••••••••</div>
+    <div class="err">Error state: "Email or password is incorrect." (after 5 tries: "Too many attempts, wait 1 minute")</div>
+    <a class="btn pri" href="#S1">Sign in</a>
+    <p class="small">Accounts are invited by the coordinator. No public sign-up.</p>
+    <span class="next">After sign-in: Student → <a href="#S1">S1</a> | Coordinator → <a href="#C1">C1</a> | Rep/Mentor → <a href="#O1">O1</a></span>
+  </div></section>
+</div>
+
+<h2 id="student">3. Student screens</h2>
+<div class="grid">
+  <section class="screen" id="S1"><div class="cap">S1 Opportunity list <i>Student</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">Opportunities | My applications | My placement | Notices (2)</span></div>
+    <div class="row"><div class="field" style="flex:1">Search title / organization</div><div class="field">Mode ▾</div><div class="field">Location ▾</div></div>
+    <div class="box"><b>Data Analyst Intern</b> - Org A<br><span class="small">Remote | Eligibility: 3rd year+ | Deadline: 30 Nov</span><br><a class="btn" href="#S2">View details</a></div>
+    <div class="box"><b>Web Developer Intern</b> - Org B<br><span class="small">On-site | Eligibility: CS/AIML | Deadline: 5 Dec</span><br><a class="btn" href="#S2">View details</a></div>
+    <div class="empty">Empty state: "No published opportunities match your filters."</div>
+    <span class="next">Prototype next → <a href="#S2">S2 Opportunity detail</a></span>
+  </div></section>
+
+  <section class="screen" id="S2"><div class="cap">S2 Opportunity detail <i>Student</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">← Back to list</span></div>
+    <b>Data Analyst Intern</b> - Org A
+    <div class="box small">Description: what the intern will do ...<br>Eligibility: 3rd year+, Python basics<br>Mode/location: Remote<br>Dates: 1 Jan - 31 Mar | Deadline: 30 Nov</div>
+    <a class="btn pri" href="#S3">Apply</a>
+    <div class="err">If already applied: "You applied on 20 Nov - see My applications." (Apply button hidden)</div>
+    <span class="next">Prototype next → <a href="#S3">S3 Apply form</a></span>
+  </div></section>
+
+  <section class="screen" id="S3"><div class="cap">S3 Apply form <i>Student</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">Applying to: Data Analyst Intern</span></div>
+    <div class="lbl">Why are you interested? (max 500 chars)</div><div class="field tall">Short statement...</div>
+    <div class="lbl">Eligibility answers</div><div class="field">Year of study ▾</div><div class="field">Relevant skills</div>
+    <div class="row"><a class="btn pri" href="#S4">Submit application</a><a class="btn" href="#S2">Cancel</a></div>
+    <div class="err">Duplicate: "You have already applied to this opportunity."</div>
+    <div class="err">Late: "The deadline (30 Nov) has passed. Applications are closed."</div>
+    <span class="next">Prototype next → <a href="#O3">O3 Rep recommends</a></span>
+  </div></section>
+
+  <section class="screen" id="S4"><div class="cap">S4 My applications - status timeline <i>Student</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">Opportunities | My applications | My placement</span></div>
+    <div class="box"><b>Data Analyst Intern</b> - Org A <span class="pill">SELECTED</span>
+      <div class="timeline small">
+        <div>20 Nov - <b>Submitted</b> (you)</div>
+        <div>22 Nov - <b>Under Review</b> (Coordinator)</div>
+        <div>25 Nov - <b>Selected</b> (Coordinator)<br>Reason: "Strong match for Python requirement."</div>
+      </div>
+      <b class="small">Next step:</b> <span class="small">Meet your mentor on 2 Dec. See My placement.</span><br>
+      <a class="btn" href="#S5">Go to my placement</a>
+    </div>
+    <div class="box"><b>Web Developer Intern</b> - Org B <span class="pill">SUBMITTED</span><br><span class="small">Next step: wait for review.</span></div>
+    <span class="next">Prototype next → <a href="#S5">S5 My placement</a></span>
+  </div></section>
+
+  <section class="screen" id="S5"><div class="cap">S5 My placement + learning goals <i>Student</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">My placement</span></div>
+    <div class="box small"><b>Data Analyst Intern</b> at Org A <span class="pill">ACTIVE</span><br>Mentor: Mentor name | 1 Jan - 31 Mar</div>
+    <div class="lbl">Learning goals</div>
+    <div class="box small">G1 Clean and explore a real dataset<br>G2 Build one dashboard<br>G3 Present findings to the team</div>
+    <div class="lbl">Weekly check-ins</div>
+    <table class="t"><tr><th>Week</th><th>Goal</th><th>Status</th></tr>
+      <tr><td>5 Jan</td><td>G1</td><td>Mentor replied</td></tr>
+      <tr><td>12 Jan</td><td>-</td><td><b>Not submitted</b></td></tr></table>
+    <a class="btn pri" href="#S6">Submit this week's check-in</a>
+    <span class="next">Prototype next → <a href="#S6">S6 Weekly check-in</a></span>
+  </div></section>
+
+  <section class="screen" id="S6"><div class="cap">S6 Weekly check-in form <i>Student</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">Week of 12 Jan</span></div>
+    <div class="lbl">Learning goal</div><div class="field">G2 Build one dashboard ▾</div>
+    <div class="lbl">What I completed</div><div class="field tall">...</div>
+    <div class="lbl">Blocker (optional)</div><div class="field">...</div>
+    <div class="lbl">Next step</div><div class="field">...</div>
+    <a class="btn pri" href="#O4">Submit check-in</a>
+    <div class="err">Duplicate: "You already submitted a check-in for this week."</div>
+    <span class="next">Prototype next → <a href="#O4">O4 Mentor replies</a></span>
+  </div></section>
+</div>
+
+<h2 id="coord">4. Coordinator screens</h2>
+<div class="grid">
+  <section class="screen" id="C1"><div class="cap">C1 Needs-action queue (home) <i>Coordinator</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">Needs action | Opportunities | Applications | Placements</span></div>
+    <div class="row">
+      <a class="box btn" href="#C2">Pending opportunities: <b>2</b></a>
+      <a class="box btn" href="#C3">Decisions waiting: <b>3</b></a>
+      <a class="box btn" href="#C5">Overdue check-ins: <b>1</b></a>
+    </div>
+    <table class="t"><tr><th>Item</th><th>Type</th><th>Since</th></tr>
+      <tr><td><a href="#C2">Web Developer Intern</a></td><td>Opportunity approval</td><td>2 days</td></tr>
+      <tr><td><a href="#C3">Student A → Data Analyst</a></td><td>Recommendation: Select</td><td>1 day</td></tr>
+      <tr><td><a href="#C5">Student B, week 5 Jan</a></td><td>Overdue check-in</td><td>9 days</td></tr></table>
+    <span class="next">Demo ends here: counts updated after the mentor reply.</span>
+  </div></section>
+
+  <section class="screen" id="C2"><div class="cap">C2 Pending opportunities <i>Coordinator</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">← Needs action</span></div>
+    <div class="box"><b>Data Analyst Intern</b> - Org A <span class="pill">PENDING REVIEW</span>
+      <div class="small">Eligibility, dates, deadline, mentor shown in full</div>
+      <div class="lbl">Comment to organization (required if returned)</div><div class="field">...</div>
+      <div class="row"><a class="btn pri" href="#S1">Approve and publish</a><a class="btn" href="#O1">Return with comment</a></div>
+    </div>
+    <span class="next">Prototype next → <a href="#S1">S1 Student sees it listed</a></span>
+  </div></section>
+
+  <section class="screen" id="C3"><div class="cap">C3 Applications + recommendations <i>Coordinator</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">Filter: opportunity ▾ status ▾</span></div>
+    <table class="t"><tr><th>Student</th><th>Opportunity</th><th>Status</th><th>Org recommends</th><th></th></tr>
+      <tr><td>Student A</td><td>Data Analyst</td><td>Under Review</td><td><b>Select</b></td><td><a href="#C4">Decide</a></td></tr>
+      <tr><td>Student C</td><td>Data Analyst</td><td>Submitted</td><td>-</td><td><a href="#C4">Decide</a></td></tr></table>
+    <p class="small">Recommendation is advice only. Students never see it as a decision.</p>
+    <span class="next">Prototype next → <a href="#C4">C4 Decision form</a></span>
+  </div></section>
+
+  <section class="screen" id="C4"><div class="cap">C4 Decision form <i>Coordinator</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">Student A → Data Analyst Intern</span></div>
+    <div class="lbl">New status</div><div class="field">Selected ▾ (Under Review / Shortlisted / Selected / Declined)</div>
+    <div class="lbl">Public reason (student sees this)</div><div class="field">...</div>
+    <div class="lbl">Next step for student</div><div class="field">...</div>
+    <div class="lbl">Internal note (never shown to student)</div><div class="field">...</div>
+    <div class="lbl">Learning goals (2-3, only when Selected)</div><div class="field">G1 ...</div><div class="field">G2 ...</div><div class="field">G3 (optional)</div>
+    <a class="btn pri" href="#S4">Confirm decision</a>
+    <div class="err">"Student already has an active placement" / "This application was already decided."</div>
+    <span class="next">Prototype next → <a href="#S4">S4 Student sees status trail</a></span>
+  </div></section>
+
+  <section class="screen" id="C5"><div class="cap">C5 Placements + overdue check-ins <i>Coordinator</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">Filter: overdue only ☐</span></div>
+    <table class="t"><tr><th>Student</th><th>Placement</th><th>Last check-in</th><th>State</th></tr>
+      <tr><td>Student A</td><td>Data Analyst</td><td>12 Jan</td><td>On track</td></tr>
+      <tr><td>Student B</td><td>Web Developer</td><td>29 Dec</td><td><b>OVERDUE</b></td></tr></table>
+    <a class="btn">Mark placement completed</a>
+    <p class="small">Overdue = no check-in 7 days after the week ends. Shown as text, not only colour.</p>
+  </div></section>
+</div>
+
+<h2 id="org">5. Organization rep / Mentor screens</h2>
+<div class="grid">
+  <section class="screen" id="O1"><div class="cap">O1 My opportunities (home) <i>Rep / Mentor</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">My opportunities | Applicants | Check-ins</span></div>
+    <a class="btn pri" href="#O2">+ New opportunity</a>
+    <table class="t"><tr><th>Title</th><th>State</th><th>Applicants</th></tr>
+      <tr><td>Data Analyst Intern</td><td>Published</td><td><a href="#O3">4</a></td></tr>
+      <tr><td>Web Developer Intern</td><td>Returned - see comment</td><td>-</td></tr>
+      <tr><td>ML Intern</td><td>Draft</td><td>-</td></tr></table>
+  </div></section>
+
+  <section class="screen" id="O2"><div class="cap">O2 Draft opportunity form <i>Rep</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">New opportunity</span></div>
+    <div class="lbl">Title</div><div class="field">...</div>
+    <div class="lbl">Description</div><div class="field tall">...</div>
+    <div class="lbl">Eligibility</div><div class="field">...</div>
+    <div class="row"><div><div class="lbl">Mode</div><div class="field">Remote ▾</div></div><div><div class="lbl">Location</div><div class="field">...</div></div></div>
+    <div class="row"><div><div class="lbl">Start / end</div><div class="field">dd/mm - dd/mm</div></div><div><div class="lbl">Deadline</div><div class="field">dd/mm</div></div></div>
+    <div class="lbl">Mentor</div><div class="field">Select mentor ▾</div>
+    <div class="row"><a class="btn">Save draft</a><a class="btn pri" href="#C2">Submit for review</a></div>
+    <span class="next">Prototype next → <a href="#C2">C2 Coordinator approves</a></span>
+  </div></section>
+
+  <section class="screen" id="O3"><div class="cap">O3 Applicants + recommend <i>Rep</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">Data Analyst Intern - own organization only</span></div>
+    <div class="box small"><b>Student A</b> - 3rd year<br>Statement: "..."<br>Eligibility answers: ...
+      <div class="lbl">Recommend</div><div class="field">Select ▾ (Shortlist / Select / Decline)</div>
+      <div class="lbl">Rationale</div><div class="field">...</div>
+      <a class="btn pri" href="#C3">Send recommendation</a></div>
+    <p class="small">Note shown: "The coordinator makes the final decision."</p>
+    <span class="next">Prototype next → <a href="#C3">C3 Coordinator reviews</a></span>
+  </div></section>
+
+  <section class="screen" id="O4"><div class="cap">O4 Assigned check-ins + feedback <i>Mentor</i></div><div class="app">
+    <div class="bar"><span class="logo">InternTrack</span><span class="links">Check-ins - assigned students only</span></div>
+    <div class="box small"><b>Student A</b> - week of 12 Jan - Goal G2<br>Completed: "..."<br>Blocker: "..."<br>Next step: "..."
+      <div class="lbl">Your feedback</div><div class="field tall">...</div>
+      <a class="btn pri" href="#C1">Send feedback</a></div>
+    <div class="empty">Empty state: "No check-ins waiting for your reply."</div>
+    <span class="next">Prototype next → <a href="#C1">C1 Coordinator queue updates</a></span>
+  </div></section>
+</div>
+
+<h2 id="rules">6. UI rules for all screens</h2>
+<ul>
+  <li>Status labels are always words (SUBMITTED, UNDER REVIEW, SHORTLISTED, SELECTED, DECLINED, ACTIVE, OVERDUE), never colour only.</li>
+  <li>Same status names in UI, database, DFD and tests (to be fixed with Kunal's state rules, KAN-18).</li>
+  <li>Every form has visible labels, clear error text next to the problem, and works with keyboard only.</li>
+  <li>Every list has an empty state. Pages reflow to one column on mobile width.</li>
+  <li>Each role sees only its own data: student = own applications, rep = own organization, mentor = assigned students.</li>
+</ul>
+</main>
+</body>
+</html>

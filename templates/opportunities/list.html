@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Opportunities{% endblock %}
+{% block content %}
+<h1>Internship opportunities</h1>
+<p class="lead">Only approved opportunities that are still open are shown.</p>
+
+<form class="filters" method="get" role="search" aria-label="Filter opportunities">
+  {% include "includes/field.html" with field=filter_form.q %}
+  {% include "includes/field.html" with field=filter_form.mode %}
+  {% include "includes/field.html" with field=filter_form.location %}
+  <button class="btn" type="submit">Apply filters</button>
+  <a class="btn" href="{% url 'opportunities:list' %}">Clear</a>
+</form>
+
+{% if page_obj.object_list %}
+<p class="meta" role="status">{{ page_obj.paginator.count }} opportunit{{ page_obj.paginator.count|pluralize:"y,ies" }} found.</p>
+<ul class="cards">
+  {% for opp in page_obj %}
+  <li class="card">
+    <h2><a href="{% url 'opportunities:detail' opp.pk %}">{{ opp.title }}</a></h2>
+    <p class="meta">{{ opp.organization.name }} | {{ opp.get_mode_display }}{% if opp.location %}, {{ opp.location }}{% endif %}</p>
+    <p class="meta"><strong>Eligibility:</strong> {{ opp.eligibility|truncatechars:120 }}</p>
+    <p class="meta"><strong>Apply by:</strong> <time datetime="{{ opp.deadline|date:'c' }}">{{ opp.deadline|date:"j M Y, H:i" }}</time></p>
+  </li>
+  {% endfor %}
+</ul>
+{% include "includes/pagination.html" %}
+{% else %}
+<p class="empty">No published opportunities match your filters.</p>
+{% endif %}
+{% endblock %}

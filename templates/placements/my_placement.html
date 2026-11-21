@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}My placement{% endblock %}
+{% block content %}
+<h1>My placement</h1>
+{% if placement %}
+<div class="panel">
+  <h2>{{ placement.opportunity.title }} at {{ placement.opportunity.organization.name }}</h2>
+  <dl class="facts">
+    <dt>Status</dt><dd>{% include "includes/status.html" with value=placement.state label=placement.get_state_display %}</dd>
+    <dt>Mentor</dt><dd>{{ placement.mentor.name }}</dd>
+    <dt>Dates</dt><dd>{{ placement.start_date|date:"j M Y" }} to {{ placement.end_date|date:"j M Y" }}</dd>
+  </dl>
+</div>
+
+<h2>Learning goals</h2>
+<ol>
+  {% for goal in goals %}<li>{{ goal.text }}</li>{% endfor %}
+</ol>
+
+<h2>Weekly check-ins</h2>
+{% if placement.state == "ACTIVE" %}
+  {% if can_submit_this_week %}
+  <p><a class="btn btn--primary" href="{% url 'placements:checkin' %}">Submit check-in for week of {{ this_week|date:"j M" }}</a></p>
+  {% else %}
+  <p class="meta">Check-in for the week of {{ this_week|date:"j M" }} is already submitted.</p>
+  {% endif %}
+{% endif %}
+
+{% if checkins %}
+<div class="tablewrap">
+<table class="data">
+  <caption>Your check-ins and mentor feedback</caption>
+  <thead><tr><th scope="col">Week of</th><th scope="col">Goal</th><th scope="col">What I did</th><th scope="col">Mentor feedback</th></tr></thead>
+  <tbody>
+  {% for c in checkins %}
+    <tr>
+      <td>{{ c.week_start|date:"j M Y" }}</td>
+      <td>{{ c.goal.text|truncatechars:40 }}</td>
+      <td>{{ c.accomplishment|truncatechars:80 }}</td>
+      <td>{% if c.feedback %}{{ c.feedback.comment }}{% else %}<em>Waiting for mentor</em>{% endif %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="empty">No check-ins yet.</p>
+{% endif %}
+{% else %}
+<p class="empty">You do not have a placement yet. When a coordinator selects you, it will appear here.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Needs action{% endblock %}
+{% block content %}
+<h1>Needs action</h1>
+<ul class="counters">
+  <li><a href="{% url 'opportunities:review_list' %}"><strong>{{ counts.pending_opportunities }}</strong> opportunities waiting for review</a></li>
+  <li><a href="{% url 'applications:review_list' %}?status=UNDER_REVIEW"><strong>{{ counts.pending_decisions }}</strong> applications waiting for a decision</a></li>
+  <li><a href="{% url 'placements:list' %}?overdue=1"><strong>{{ counts.overdue_checkins }}</strong> overdue check-ins</a></li>
+</ul>
+
+{% if items %}
+<div class="tablewrap">
+<table class="data">
+  <caption>Oldest first</caption>
+  <thead><tr><th scope="col">Item</th><th scope="col">Type</th><th scope="col">Waiting since</th></tr></thead>
+  <tbody>
+  {% for item in items %}
+    <tr><td><a href="{{ item.url }}">{{ item.label }}</a></td><td>{{ item.kind }}</td><td>{{ item.since|timesince }} ago</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="empty">Nothing needs your action right now.</p>
+{% endif %}
+<p class="actions"><a class="btn" href="{% url 'dashboard:export' %}">Download summary counts (CSV, no names)</a></p>
+{% endblock %}

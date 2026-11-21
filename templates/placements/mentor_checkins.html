@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Check-ins{% endblock %}
+{% block content %}
+<h1>Check-ins from your interns</h1>
+<p class="lead">Only students assigned to you are shown.</p>
+{% if checkins %}
+<ul class="cards">
+  {% for c in checkins %}
+  <li class="card">
+    <h2>{{ c.placement.student.name }} &ndash; week of {{ c.week_start|date:"j M Y" }}</h2>
+    <p class="meta">{{ c.placement.opportunity.title }} | Goal: {{ c.goal.text }}</p>
+    <dl class="facts">
+      <dt>Completed</dt><dd>{{ c.accomplishment|linebreaksbr }}</dd>
+      <dt>Blocker</dt><dd>{{ c.blocker|default:"None" }}</dd>
+      <dt>Next step</dt><dd>{{ c.next_step }}</dd>
+    </dl>
+    {% if c.feedback %}
+      <p class="panel"><strong>Your feedback ({{ c.feedback.responded_at|date:"j M Y" }}):</strong> {{ c.feedback.comment }}</p>
+    {% else %}
+    <form method="post" action="{% url 'placements:feedback' c.pk %}" class="stack">{% csrf_token %}
+      <div class="field">
+        <label for="comment-{{ c.pk }}">Your feedback <span class="req" aria-hidden="true">*</span></label>
+        <textarea id="comment-{{ c.pk }}" name="comment" required maxlength="1000"></textarea>
+      </div>
+      <button class="btn btn--primary" type="submit">Send feedback<span class="visually-hidden"> to {{ c.placement.student.name }}</span></button>
+    </form>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="empty">No check-ins waiting for your reply.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Applications{% endblock %}
+{% block content %}
+<h1>Applications</h1>
+<form class="filters" method="get" aria-label="Filter applications">
+  {% include "includes/field.html" with field=filter_form.opportunity %}
+  {% include "includes/field.html" with field=filter_form.status %}
+  <button class="btn" type="submit">Apply filters</button>
+</form>
+
+{% if page_obj.object_list %}
+<div class="tablewrap">
+<table class="data">
+  <thead><tr><th scope="col">Student</th><th scope="col">Opportunity</th><th scope="col">Status</th><th scope="col">Organization recommends</th><th scope="col">Action</th></tr></thead>
+  <tbody>
+  {% for app in page_obj %}
+    <tr>
+      <td>{{ app.student.name }}</td>
+      <td>{{ app.opportunity.title }}</td>
+      <td>{% include "includes/status.html" with value=app.status label=app.get_status_display %}</td>
+      <td>{% if app.latest_recommendation %}<strong>{{ app.latest_recommendation.get_suggestion_display }}</strong><br><span class="meta">{{ app.latest_recommendation.rationale|truncatechars:60 }}</span>{% else %}<span class="meta">None yet</span>{% endif %}</td>
+      <td>{% if app.status in "SUBMITTED UNDER_REVIEW SHORTLISTED" %}<a class="btn" href="{% url 'applications:decide' app.pk %}">Decide<span class="visually-hidden"> for {{ app.student.name }}</span></a>{% else %}<span class="meta">Final</span>{% endif %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<p class="meta">Organization recommendations are advice only. Students only see coordinator decisions.</p>
+{% include "includes/pagination.html" %}
+{% else %}
+<p class="empty">No applications match these filters.</p>
+{% endif %}
+{% endblock %}
