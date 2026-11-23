@@ -1,10 +1,14 @@
 # InternTrack
 
+[![CI](https://github.com/gundatharuntej2006-hue/InternTrack/actions/workflows/ci.yml/badge.svg)](https://github.com/gundatharuntej2006-hue/InternTrack/actions/workflows/ci.yml)
+
 Internship and Training Management System for One University Department.
 
-> **Status:** DT-1 (project foundation). This sets up the Django project, a
-> PostgreSQL database in Docker, environment-based configuration and a
-> `/health/` endpoint. Feature modules come in later milestones.
+> **Status:** DT-1 (project foundation) and DT-2 (CI). This sets up the
+> Django project, a PostgreSQL database in Docker, environment-based
+> configuration, a `/health/` endpoint, and GitHub Actions CI that runs the
+> tests on every push and pull request. Feature modules come in later
+> milestones.
 
 ---
 
@@ -24,6 +28,7 @@ Internship and Training Management System for One University Department.
 12. [Project structure](#12-project-structure)
 13. [Daily workflow cheat sheet](#13-daily-workflow-cheat-sheet)
 14. [Team Git workflow](#14-team-git-workflow)
+15. [Continuous integration (CI)](#15-continuous-integration-ci)
 
 **Short on time?** Jump to the [Quick start](#quick-start-tldr).
 
@@ -305,6 +310,9 @@ OK
 
 Verbose output: `python manage.py test -v 2`.
 
+The same tests also run automatically on GitHub for every push and pull
+request; see [Continuous integration (CI)](#15-continuous-integration-ci).
+
 Other useful checks:
 
 ```bash
@@ -387,6 +395,9 @@ custom/external PostgreSQL. Grant it with `ALTER USER <user> CREATEDB;`.
 
 ```
 InternTrack/
+├── .github/
+│   └── workflows/
+│       └── ci.yml           # GitHub Actions: run tests on every push / PR
 ├── apps/                    # InternTrack's own Django apps (one per feature module)
 │   └── core/                # Shared infrastructure: health check
 │       ├── apps.py
@@ -523,7 +534,8 @@ gh pr create --base main --head <your-branch> --title "DT-x: what you did" --bod
 ```
 
 Then **wait for a teammate to review**. Merge only after approval, and
-after the tests pass (`python manage.py test`).
+after the **CI** check on the pull request is green (see
+[section 15](#15-continuous-integration-ci)).
 
 ### After your PR is merged
 
@@ -551,3 +563,34 @@ git config user.email "<id>+<username>@users.noreply.github.com"   # shown on th
   excludes `.env` and `.env.*` (except `.env.example`).
 - The values in `.env.example` are placeholders for local development only.
 - `DJANGO_DEBUG` must be `False` in any shared or production environment.
+
+---
+
+## 15. Continuous integration (CI)
+
+Every push to **any branch** and every **pull request** automatically runs
+the workflow in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) on
+GitHub Actions. You can also start it by hand from the **Actions** tab
+(**CI → Run workflow**).
+
+What it does, on a fresh Ubuntu runner:
+
+1. Starts a temporary **PostgreSQL 17** container (same image as
+   `docker-compose.yml`) and waits until it is healthy.
+2. Installs **Python 3.11** and the pinned packages from `requirements.txt`.
+3. Runs `python manage.py check`, `python manage.py makemigrations --check --dry-run`
+   and `python manage.py test --verbosity 2`.
+
+If any step fails, the check turns red on the commit / pull request. Click
+**Details** next to the check to see the log.
+
+**No `.env` and no secrets are needed.** The workflow sets its own
+environment variables. The database password in `ci.yml` is a throwaway
+value for a database that exists only during that CI run, and
+`DJANGO_SECRET_KEY` is randomly generated on every run. Never put real
+passwords or keys into the workflow file; if a later milestone needs one,
+store it under **Settings → Secrets and variables → Actions** and reference
+it as `${{ secrets.NAME }}`.
+
+The workflow has read-only access to the repository, and its actions are
+pinned to exact commit SHAs.
