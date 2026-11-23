@@ -18,4 +18,16 @@ Version 0.2, 20 November 2026. Screen evidence now comes from KAN-44, template a
 
 Cross-cutting checks remain AT24 keyboard/screen-reader/reflow, AT25 load/p95, AT26 backup/restore, AT27 security/CSRF/rate limit, AT28 clean setup/migrations. KAN-49 tracks Atul's accessibility work. No integrated pass is recorded without an actual build, command/steps and result.
 
+## Executable opportunity evidence - 24 November 2026
+
+PR #1 is merged to main at 75fa89a49dde50296126e1a070db15d3a2ef5a37. Main CI passed at https://github.com/gundatharuntej2006-hue/InternTrack/actions/runs/45221251506 . FR2/FR3 now have actual Django services in apps/opportunities/services.py and PostgreSQL-backed tests in apps/core/test_opportunities.py. Test fixture tables are in apps/core/opportunity_test_models.py. These supplement the original proposed AT03-AT06 mappings above.
+
+- FR2 AC2.1/2.3 maps to partial-draft/submission validation, ownership, protected-field and returned-edit/resubmit tests.
+- FR2 AC2.2 / FR3 AC3.3 maps to test_all_nonpublished_states_hidden and test_exact_deadline_and_timezone.
+- FR3 AC3.1/3.2 maps to publication approval/history and coordinator/return-reason validation tests.
+- FR3 AC3.4 maps to test_stale_record_rejected_without_new_event, test_atomic_event_failure_rolls_back_state_and_approval, and the 24 November concurrency candidate test_concurrent_approve_and_return_allow_only_one_transition.
+- FR4 AC4.4 has application guard evidence in test_application_guard_rechecks_state_and_deadline. Actual Application insertion/uniqueness tests are still pending.
+
+The 24 November local PostgreSQL run passed 30 tests, including 23 opportunity tests and seven foundation tests. Review outcomes are recorded in acceptance-review-2026-11-24.md and status-wording-audit-2026-11-24.md. Other Must-FR runtime mappings remain pending their modules. KAN-22 remains In Progress.
+
 Naming correction to the initial assignment references follows actual Jira tasks. UA-1 wireframes are KAN-44, UA-2 schema is KAN-45, UA-3 contracts are KAN-46, UA-4/5 templates are KAN-47/48. Repository/setup is KAN-28 and CI is KAN-29. Exact links supersede the earlier placeholder UA-2/UA-5 references.
