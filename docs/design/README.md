@@ -49,5 +49,8 @@ Templates use URL names such as `{% url 'opportunities:list' %}`, so each app ne
 | `applications/applicants.html` | `applications:applicants`, `applications:recommend` | `opportunity`, `applications` (each with `my_recommendation`) |
 | `placements/mentor_checkins.html` | `placements:mentor_checkins`, `placements:feedback` | `checkins` |
 
+The menu in `base.html` only shows a link once its URL name exists, so placeholder
+pages can extend `base.html` before every feature app is built.
+
 `placement.opportunity` is a model property returning `placement.application.opportunity`.
 Status and choice fields use the `get_<field>_display` labels from UA-2.
