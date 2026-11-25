@@ -8,6 +8,7 @@ html{font-size:16px}
 body{margin:0;font:1rem/1.5 system-ui,"Segoe UI",Arial,sans-serif;color:var(--ink);background:var(--bg)}
 a{color:var(--brand)}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.topbar :focus-visible{outline-color:#fff}
 .skip{position:absolute;left:-999px;top:0;background:#fff;padding:8px;z-index:10}
 .skip:focus{left:8px}
 
@@ -57,7 +58,7 @@ dl.facts dd{margin:0}
 .nextstep{border:2px solid var(--brand);border-radius:6px;padding:8px 12px;margin-top:8px}
 
 /* tables */
-.tablewrap{overflow-x:auto}
+.tablewrap{overflow-x:auto;position:relative}
 table.data{width:100%;border-collapse:collapse;font-size:.95rem}
 table.data th,table.data td{border:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
 table.data th{background:var(--panel)}

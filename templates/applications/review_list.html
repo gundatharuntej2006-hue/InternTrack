@@ -10,7 +10,7 @@
 
 {% if page_obj.object_list %}
 <div class="tablewrap">
-<table class="data">
+<table class="data" aria-label="Applications">
   <thead><tr><th scope="col">Student</th><th scope="col">Opportunity</th><th scope="col">Status</th><th scope="col">Organization recommends</th><th scope="col">Action</th></tr></thead>
   <tbody>
   {% for app in page_obj %}
