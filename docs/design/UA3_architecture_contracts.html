@@ -127,11 +127,11 @@ flowchart LR
 <table>
 <tr><th>Field</th><th>Input</th><th>Validation</th></tr>
 <tr><td>title</td><td>text</td><td>required, max 150</td></tr>
-<tr><td colspan="3"><strong>Save draft</strong> needs only title + mode, so partial work can be saved and reopened. <strong>Submit for review</strong> needs every field below; on errors the opportunity stays Draft/Returned (form flag <code>submitting=True</code>).</td></tr>
+<tr><td colspan="3"><strong>Save draft</strong> needs only title, so partial work can be saved and reopened. <strong>Submit for review</strong> needs every required field below; on errors the opportunity stays Draft/Returned (form flag <code>submitting=True</code>).</td></tr>
 <tr><td>description</td><td>textarea</td><td>required to submit</td></tr>
 <tr><td>eligibility</td><td>textarea</td><td>required to submit</td></tr>
-<tr><td>mode</td><td>select Remote / On-site / Hybrid</td><td>required</td></tr>
-<tr><td>location</td><td>text</td><td>required unless Remote</td></tr>
+<tr><td>mode</td><td>select Remote / On-site / Hybrid</td><td>required to submit</td></tr>
+<tr><td>location</td><td>text</td><td>required to submit unless Remote</td></tr>
 <tr><td>start_date, end_date</td><td>date</td><td>required to submit; start &lt;= end</td></tr>
 <tr><td>deadline</td><td>date + time, IST (Asia/Kolkata)</td><td>required to submit; in the future when submitted. Shown everywhere as e.g. "5 Dec 2026, 17:00 IST"; applications close at that exact instant</td></tr>
 <tr><td>mentor</td><td>select (reps of own org)</td><td>required to submit; must belong to same organization. Inherited by the placement on Select (no separate choice at C4)</td></tr>
@@ -243,7 +243,7 @@ sequenceDiagram
     S-->>V: error
     V-->>St: form error, nothing saved
   else ok
-    S->>DB: INSERT Application (SUBMITTED), ApplicationEvent, Notification APP_SUBMITTED, COMMIT
+    S->>DB: INSERT Application (SUBMITTED), StatusEvent, Notification APP_SUBMITTED, COMMIT
     V-->>St: redirect to My applications
   end
 </pre>

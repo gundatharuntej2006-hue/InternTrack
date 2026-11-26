@@ -36,13 +36,13 @@ class OpportunityForm(forms.Form):
     action=submit; on errors the opportunity stays in Draft/Returned.
     """
 
-    REQUIRED_TO_SUBMIT = ("description", "eligibility", "start_date", "end_date", "deadline", "mentor")
+    REQUIRED_TO_SUBMIT = ("description", "eligibility", "mode", "start_date", "end_date", "deadline", "mentor")
 
     title = forms.CharField(max_length=150)
     description = forms.CharField(widget=forms.Textarea, required=False)
     eligibility = forms.CharField(widget=forms.Textarea, required=False,
                                   help_text="Who can apply, for example year and skills")
-    mode = forms.ChoiceField(choices=MODE_CHOICES)
+    mode = forms.ChoiceField(choices=[("", "Choose...")] + MODE_CHOICES, required=False)
     location = forms.CharField(max_length=150, required=False, help_text="Required unless Remote")
     start_date = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}), required=False)
     end_date = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}), required=False)
@@ -66,7 +66,7 @@ class OpportunityForm(forms.Form):
                 self.add_error("deadline", "The deadline must be in the future.")
         if data.get("start_date") and data.get("end_date") and data["start_date"] > data["end_date"]:
             self.add_error("end_date", "End date must be on or after the start date.")
-        if data.get("mode") in ("ONSITE", "HYBRID") and not data.get("location"):
+        if self.submitting and data.get("mode") in ("ONSITE", "HYBRID") and not data.get("location"):
             self.add_error("location", "Location is required for on-site and hybrid internships.")
         return data
 

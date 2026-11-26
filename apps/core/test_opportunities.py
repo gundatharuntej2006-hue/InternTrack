@@ -1,10 +1,12 @@
 from datetime import timedelta, timezone as datetime_timezone
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier
 from unittest.mock import patch
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import connection
-from django.test import TestCase
+from django.db import close_old_connections, connection, connections
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.utils import timezone
 
 from apps.opportunities import services
@@ -225,3 +227,67 @@ class OpportunityWorkflowTests(TestCase):
             services.return_for_changes(published, self.coordinator, "Change")
         with self.assertRaises(ValidationError):
             services.submit_for_review(published, self.rep)
+
+
+class OpportunityConcurrencyTests(TransactionTestCase):
+    """Verify row locking with separate committed transactions/connections."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.fixture_models = [ReviewOrganization, ReviewAccount, ReviewOpportunity, ReviewOpportunityEvent]
+        with connection.schema_editor() as editor:
+            for model in cls.fixture_models:
+                editor.create_model(model)
+        super().setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        with connection.schema_editor() as editor:
+            for model in reversed(cls.fixture_models):
+                editor.delete_model(model)
+
+    @skipUnlessDBFeature("has_select_for_update")
+    def test_concurrent_approve_and_return_allow_only_one_transition(self):
+        organization = ReviewOrganization.objects.create()
+        representative = ReviewAccount.objects.create(role="ORG_REP", organization=organization)
+        coordinator = ReviewAccount.objects.create(role="COORDINATOR")
+        now = timezone.now()
+        opportunity = ReviewOpportunity.objects.create(
+            organization=organization, created_by=representative, mentor=representative,
+            title="Concurrent review", description="Synthetic work", eligibility="Demo cohort",
+            mode="REMOTE", start_date=(now + timedelta(days=3)).date(),
+            end_date=(now + timedelta(days=30)).date(), deadline=now + timedelta(days=2),
+            state=services.PENDING_REVIEW,
+        )
+        both_loaded = Barrier(2)
+
+        def decide(action):
+            close_old_connections()
+            try:
+                snapshot = ReviewOpportunity.objects.get(pk=opportunity.pk)
+                actor = ReviewAccount.objects.get(pk=coordinator.pk)
+                both_loaded.wait(timeout=10)
+                try:
+                    if action == "approve":
+                        updated = services.approve(snapshot, actor)
+                    else:
+                        updated = services.return_for_changes(snapshot, actor, "Clarify eligibility")
+                    return "accepted", updated.state
+                except ValidationError:
+                    return "rejected", None
+            finally:
+                connections.close_all()
+
+        with ThreadPoolExecutor(max_workers=2) as workers:
+            approve_result = workers.submit(decide, "approve")
+            return_result = workers.submit(decide, "return")
+            results = [approve_result.result(timeout=20), return_result.result(timeout=20)]
+
+        self.assertCountEqual([result[0] for result in results], ["accepted", "rejected"])
+        opportunity.refresh_from_db()
+        event = opportunity.review_events.get()
+        self.assertEqual(event.from_state, services.PENDING_REVIEW)
+        self.assertEqual(event.to_state, opportunity.state)
+        accepted_state = next(state for result, state in results if result == "accepted")
+        self.assertEqual(opportunity.state, accepted_state)
