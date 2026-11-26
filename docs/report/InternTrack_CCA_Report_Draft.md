@@ -487,3 +487,21 @@ Kunal reports commit 3bdbee3 added transactional workflow services and 22 databa
 The stated 240-person-hour ten-week proposal does not establish feasible capacity before 27 Nov. Remaining work must follow the compressed milestone tracker. Track proposed deferral of FR10/FR11 through team change control and preserve essential authorization and transaction/history integrity checks. Schedule review is recorded; whole-team technical or sponsor approval is pending.
 
 
+
+
+## Design and accessibility handover reviewed 26 November 2026
+
+Atul delivered UI and design materials in PR #3, which was open and unmerged when checked. The inspected source commit is cec841975d6e12b2c2cf84e9cca088f65843fe8a on atul. It includes 20 page templates, shared CSS, form definitions, navigation/wireframes, schema/permissions, architecture/contracts and template context documentation.
+
+Sources:
+- https://github.com/gundatharuntej2006-hue/InternTrack/pull/3
+- https://github.com/gundatharuntej2006-hue/InternTrack/blob/cec841975d6e12b2c2cf84e9cca088f65843fe8a/docs/design/README.md
+- https://github.com/gundatharuntej2006-hue/InternTrack/blob/cec841975d6e12b2c2cf84e9cca088f65843fe8a/docs/design/UA6_accessibility.html
+
+### Accessibility evidence and scope
+Atul’s report dated 25 November records 20/20 automated template-preview checks, 11/11 colour pairs, and 19/19 pages at 320px passing after fixes. It also records keyboard focus, skip-link and form-error checks. These are author-reported results from template previews. The evidence inspected here was the report and source inventory; the checks were not independently rerun.
+
+The report targets WCAG 2.1 AA, while KAN-49 calls for WCAG 2.2 AA. This version difference requires clarification before final wording. Running-app keyboard/error/focus/reflow checks, NVDA testing on the demo path and 200% zoom remain explicitly pending in the report. Full integrated accessibility conformance remains unverified.
+
+### Documentation readiness
+KAN-44/45/46/49 are in review. Use the available design handover as source material for the design section and retain pending review status. Confirm final DFD 0/1/2, data dictionary and resolved review findings against the delivered artifacts before submission. Backend integration and PR review remain technical-owner dependencies.
