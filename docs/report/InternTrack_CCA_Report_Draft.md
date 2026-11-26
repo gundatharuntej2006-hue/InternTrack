@@ -29,7 +29,19 @@ Detailed source requirements are maintained in KAN-19 and the repository require
 
 ## 4 Project Plan
 
-Ritika maintains the WBS, schedule, dependencies, risk register and action log. The recorded submission target is 27 November. Internal targets are tentative: report compilation and proposed integration testing on 24 November, team review and rehearsal on 25 November, and final file/access checks on 26 November. Technical owners must confirm feasibility. The detailed planning record remains in KAN-8, with actions in KAN-9.
+Ritika maintains the WBS, schedule, dependencies, risk register and action log. The recorded submission target is 27 November. The earlier 24 November compilation/integration and 25 November review/rehearsal targets have elapsed; their completion is unverified. Final file/access checks are planned for 26 November. Technical owners must confirm feasibility. The detailed planning record remains in KAN-8, with actions in KAN-9.
+
+| Work package | Responsible member | Handover dependency |
+|---|---|---|
+| Scope and requirements | Kunal | Reviewed requirements and assumptions |
+| Process selection | Team decision, Ritika documents | Agreed rationale and phase diagram |
+| WBS, schedule and risk tracking | Ritika | Owner estimates and delivery updates |
+| Design models and contracts | Atul | Requirements/state baseline |
+| Build, integration and testing | Tharun with feature contributors | Schema, permissions and feature handovers |
+| Report compilation | Ritika | Reviewed technical evidence |
+| Review, rehearsal and submission | Ritika coordinates, all members participate | Final files, verified links and instructor instructions |
+
+The main risks are late handovers, requirements/design inconsistencies, incomplete integrated validation, missing contribution evidence and inaccessible submission links. Ritika tracks these in Jira, requests revised dates for slipped handovers, and records known limitations in the report.
 
 ## 5 Software Design
 
@@ -45,13 +57,34 @@ Ritika prepared the planning tracker, WBS, risk register, action log, report str
 
 ## 7 Ethical and Professional Considerations
 
-Use synthetic demonstration data and minimize personal information. Validate role and record access with technical owners. Review accessibility and clear status wording, attribute external material, and disclose assumptions and validation limits. These are proposed mitigations requiring team validation. The draft ethics table is maintained in KAN-10 for team validation.
+Use synthetic demonstration data and minimize personal information. Validate role and record access with technical owners. Review accessibility and clear status wording, attribute external material, and disclose assumptions and validation limits. These are proposed mitigations requiring team validation. The following mitigations require team validation.
+
+| Risk | Potential impact | Proposed mitigation and evidence |
+|---|---|---|
+| Personal information exposure | Disclosure of student or organization records | Use synthetic demo data, minimize fields and inspect screenshots before publication. |
+| Excessive permissions | Unauthorized record access or decisions | Technical owners verify role and ownership checks and retain negative-test evidence. |
+| Accessibility barriers | Users cannot navigate or understand forms | Retain preview checks and complete runtime keyboard, screen-reader and zoom reviews. |
+| Uncredited reuse | Misrepresentation or licence conflict | Cite external sources and verify licences for reused assets and code. |
+| Unsupported findings | Readers mistake synthetic analysis for field research | State zero real participants and preserve Unknown department assumptions. |
+| Unclear accountability | Decisions and defects lack owners | Maintain dated Jira actions, reviewer decisions and contribution evidence. |
 
 ## 8 Conclusion and References
 
 The team has produced planning records and reviewable requirements/design contributions. Integrated application readiness and final acceptance remain open. The final conclusion must be updated from verified demonstration evidence.
 
-Sources: CCA_Team_Project_Guidelines_UG_Students.docx; Jira KAN-8, KAN-9, KAN-19, KAN-44/45/46; Kunal’s 23 November updates on KAN-9; repository PR #1. Add references for any reused technical assets and diagrams supplied by the team.
+### Source register
+
+| Source | Use in this report |
+|---|---|
+| CCA Team Project Guidelines for UG Students, supplied course document | Required structure, models, submission evidence and participation |
+| [KAN-8](https://gundatharuntej2006.atlassian.net/browse/KAN-8) | Planning baseline, WBS and risks |
+| [KAN-9](https://gundatharuntej2006.atlassian.net/browse/KAN-9) | Dated teammate handovers and verification updates |
+| [KAN-19](https://gundatharuntej2006.atlassian.net/browse/KAN-19) | SRS v0.2 and pending baseline decisions |
+| [PR #1](https://github.com/gundatharuntej2006-hue/InternTrack/pull/1) | Requirements and workflow contribution |
+| [PR #3](https://github.com/gundatharuntej2006-hue/InternTrack/pull/3) | Design and template delivery |
+| [Accessibility source at inspected commit](https://github.com/gundatharuntej2006-hue/InternTrack/blob/cec841975d6e12b2c2cf84e9cca088f65843fe8a/docs/design/UA6_accessibility.html) | Author-reported preview results and pending runtime checks |
+
+Add asset, library and diagram references when final technical material is inserted.
 
 
 ## Design and verification evidence
