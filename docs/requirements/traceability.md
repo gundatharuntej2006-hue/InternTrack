@@ -30,4 +30,8 @@ PR #1 is merged to main at 75fa89a49dde50296126e1a070db15d3a2ef5a37. Main CI pas
 
 The 24 November local PostgreSQL run passed 30 tests, including 23 opportunity tests and seven foundation tests. Review outcomes are recorded in acceptance-review-2026-11-24.md and status-wording-audit-2026-11-24.md. Other Must-FR runtime mappings remain pending their modules. KAN-22 remains In Progress.
 
+## Form and design follow-up - 27 November 2026
+
+Atul's PR #3 is merged in main at f179c7d. UI-02 through UI-06 now have the design/template/contract fixes reviewed in design-recheck-2026-11-27.md. Kunal's PR #2 adds the remaining UI-01 correction and canonical StatusEvent diagram name. FR2 AC2.1/2.3 now also maps to apps/core/test_opportunity_forms.py: title-only, on-site and hybrid partial drafts; missing mode/location rejection on submission; valid complete submission. The full PostgreSQL candidate suite passes 36 tests. Production HTTP/object-permission and the other Must-FR runtime mappings remain pending.
+
 Naming correction to the initial assignment references follows actual Jira tasks. UA-1 wireframes are KAN-44, UA-2 schema is KAN-45, UA-3 contracts are KAN-46, UA-4/5 templates are KAN-47/48. Repository/setup is KAN-28 and CI is KAN-29. Exact links supersede the earlier placeholder UA-2/UA-5 references.
