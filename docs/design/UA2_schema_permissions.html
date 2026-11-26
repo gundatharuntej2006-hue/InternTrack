@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InternTrack Schema</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<style>
+:root{--ink:#1f2937;--muted:#6b7280;--line:#cbd5e1;--head:#1b2b45;--alt:#f5f7fa;--y:#e3f4e8;--n:#fdecec;--c:#fdf1d8}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 system-ui,Segoe UI,Arial,sans-serif;color:var(--ink);background:#fff}
+header{background:var(--head);color:#fff;padding:18px 24px}
+header h1{margin:0;font-size:20px}header p{margin:4px 0 0;opacity:.85}
+nav{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:8px 24px;display:flex;gap:14px;flex-wrap:wrap;z-index:5}
+nav a{color:var(--head);font-weight:600;text-decoration:none}
+main{max-width:1180px;margin:0 auto;padding:16px}
+h2{color:var(--head);border-bottom:2px solid var(--head);padding-bottom:4px;margin-top:34px;scroll-margin-top:50px}
+h3{margin:22px 0 6px}
+.note{color:var(--muted);font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0 14px}
+th,td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+th{background:var(--head);color:#fff}
+tr:nth-child(even) td{background:var(--alt)}
+code{font-family:Consolas,monospace;font-size:12.5px;background:#eef2f7;padding:0 3px;border-radius:3px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px}
+.card{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.card h3{margin:0;padding:7px 10px;background:#e8edf4;font-size:14px}
+.card table{margin:0}.card td,.card th{border-left:0;border-right:0}
+.card .rule{padding:6px 10px;font-size:12px;color:var(--muted);border-top:1px solid var(--line)}
+td.y{background:var(--y)!important}td.n{background:var(--n)!important}td.c{background:var(--c)!important}
+.mermaid{border:1px solid var(--line);border-radius:8px;padding:10px;overflow-x:auto;background:#fff}
+.pill{display:inline-block;border:1px solid var(--ink);border-radius:10px;padding:0 7px;font-size:11px;font-weight:700;margin:1px}
+@media (max-width:600px){main{padding:10px}.cards{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>InternTrack - UA-2 Database schema and permission matrix</h1>
+  <p>Member 3 (UI Design and Architecture) | Draft v0.1 | Status names follow KAN-18 (RA-6 state contract v0.1) | Target: Django + PostgreSQL</p>
+</header>
+<nav>
+  <a href="#er">1. ER diagram</a><a href="#tables">2. Tables</a><a href="#enums">3. Status values</a>
+  <a href="#rules">4. Constraints + indexes</a><a href="#perm">5. Permission matrix</a><a href="#open">6. Open questions</a>
+</nav>
+<main>
+
+<h2 id="er">1. ER diagram</h2>
+<p class="note">12 tables. Proposal data dictionary (D1-D5) plus <code>OpportunityEvent</code>, added because KAN-18 asks for an atomic, retained review history for opportunities.</p>
+<div class="mermaid">
+erDiagram
+  ORGANIZATION ||--o{ USER : "employs (org reps)"
+  ORGANIZATION ||--o{ OPPORTUNITY : "owns"
+  USER ||--o{ OPPORTUNITY : "mentors"
+  OPPORTUNITY ||--o{ OPPORTUNITY_EVENT : "review history"
+  USER ||--o{ APPLICATION : "applies (student)"
+  OPPORTUNITY ||--o{ APPLICATION : "receives"
+  APPLICATION ||--o{ STATUS_EVENT : "status trail"
+  APPLICATION ||--o{ RECOMMENDATION : "org advice"
+  APPLICATION ||--o| PLACEMENT : "creates when Selected"
+  PLACEMENT ||--|{ LEARNING_GOAL : "has 2-3"
+  PLACEMENT ||--o{ CHECK_IN : "weekly"
+  LEARNING_GOAL ||--o{ CHECK_IN : "referenced by"
+  CHECK_IN ||--o| FEEDBACK : "mentor reply"
+  USER ||--o{ NOTIFICATION : "receives"
+</div>
+
+<h2 id="tables">2. Tables</h2>
+<p class="note">Every table also has <code>id</code> (BigAutoField primary key). Times are stored as timezone-aware UTC and shown in Asia/Kolkata (KAN-18). FK = foreign key. "PROTECT" = cannot delete the parent while children exist (keeps history).</p>
+<div class="cards">
+
+<div class="card"><h3>D1 User</h3><table>
+<tr><th>Field</th><th>Type</th><th>Rule</th></tr>
+<tr><td>email</td><td>EmailField</td><td>unique, university email, login name</td></tr>
+<tr><td>name</td><td>CharField(120)</td><td>required</td></tr>
+<tr><td>role</td><td>CharField enum</td><td>STUDENT / COORDINATOR / ORG_REP</td></tr>
+<tr><td>organization</td><td>FK Organization, null</td><td>required if ORG_REP, empty otherwise</td></tr>
+<tr><td>year_of_study, program</td><td>small int / CharField, null</td><td>students only (eligibility)</td></tr>
+<tr><td>password, is_active, last_login</td><td>Django auth</td><td>framework hashing</td></tr>
+</table><div class="rule">Accounts are created/invited by the coordinator. An ORG_REP is also the mentor role (proposal section 11).</div></div>
+
+<div class="card"><h3>D1 Organization</h3><table>
+<tr><th>Field</th><th>Type</th><th>Rule</th></tr>
+<tr><td>name</td><td>CharField(150)</td><td>unique</td></tr>
+<tr><td>status</td><td>CharField enum</td><td>ACTIVE / INACTIVE</td></tr>
+<tr><td>created_by</td><td>FK User (coordinator)</td><td>PROTECT</td></tr>
+<tr><td>created_at</td><td>DateTime</td><td>auto</td></tr>
+</table></div>
+
+<div class="card"><h3>D2 Opportunity</h3><table>
+<tr><th>Field</th><th>Type</th><th>Rule</th></tr>
+<tr><td>organization</td><td>FK Organization</td><td>set from actor, never from form</td></tr>
+<tr><td>title, description, eligibility</td><td>Char(150) / Text / Text</td><td>required to submit</td></tr>
+<tr><td>mode</td><td>CharField enum</td><td>REMOTE / ONSITE / HYBRID</td></tr>
+<tr><td>location</td><td>CharField(150), blank</td><td></td></tr>
+<tr><td>start_date, end_date</td><td>Date</td><td>start &lt;= end</td></tr>
+<tr><td>deadline</td><td>DateTime (aware)</td><td>future when submitted</td></tr>
+<tr><td>mentor</td><td>FK User</td><td>ORG_REP of same organization</td></tr>
+<tr><td>state</td><td>CharField enum</td><td>see section 3</td></tr>
+<tr><td>created_by / approved_by</td><td>FK User / FK User null</td><td>PROTECT</td></tr>
+<tr><td>approved_at, return_reason, closed_reason</td><td>DateTime null / Text / Text</td><td>set by coordinator actions</td></tr>
+<tr><td>created_at, updated_at</td><td>DateTime</td><td>auto</td></tr>
+</table><div class="rule">Student sees it only if state = PUBLISHED AND now &lt; deadline (checked on every query, not by a scheduled job).</div></div>
+
+<div class="card"><h3>D2 OpportunityEvent <i>(added)</i></h3><table>
+<tr><th>Field</th><th>Type</th><th>Rule</th></tr>
+<tr><td>opportunity</td><td>FK Opportunity</td><td>PROTECT</td></tr>
+<tr><td>from_state, to_state</td><td>CharField enum</td><td>from null on first save</td></tr>
+<tr><td>actor</td><td>FK User, null</td><td>null = system deadline closure</td></tr>
+<tr><td>reason</td><td>Text, blank</td><td>required for Return and Close</td></tr>
+<tr><td>created_at</td><td>DateTime</td><td>auto</td></tr>
+</table><div class="rule">Append-only. Written in the same transaction as the state change.</div></div>
+
+<div class="card"><h3>D3 Application</h3><table>
+<tr><th>Field</th><th>Type</th><th>Rule</th></tr>
+<tr><td>student</td><td>FK User</td><td>from session, never from form</td></tr>
+<tr><td>opportunity</td><td>FK Opportunity</td><td>PROTECT</td></tr>
+<tr><td>statement</td><td>Text (max 1000)</td><td>required</td></tr>
+<tr><td>eligibility_answers</td><td>JSONField</td><td>short answers only</td></tr>
+<tr><td>status</td><td>CharField enum</td><td>current status, see section 3</td></tr>
+<tr><td>public_next_step</td><td>Text, blank</td><td>copied from latest event</td></tr>
+<tr><td>submitted_at, updated_at</td><td>DateTime</td><td>server time</td></tr>
+</table><div class="rule">UNIQUE (student, opportunity).</div></div>
+
+<div class="card"><h3>D3 StatusEvent</h3><table>
+<tr><th>Field</th><th>Type</th><th>Rule</th></tr>
+<tr><td>application</td><td>FK Application</td><td>PROTECT</td></tr>
+<tr><td>from_status, to_status</td><td>CharField enum</td><td>from null for Submitted</td></tr>
+<tr><td>actor</td><td>FK User</td><td>student (submit) or coordinator</td></tr>
+<tr><td>public_reason, public_next_step</td><td>Text</td><td>shown to student</td></tr>
+<tr><td>internal_note</td><td>Text, blank</td><td><b>never</b> sent to student</td></tr>
+<tr><td>created_at</td><td>DateTime</td><td>auto</td></tr>
+</table><div class="rule">Append-only. Saved in one transaction with Application.status.</div></div>
+
+<div class="card"><h3>D3 Recommendation</h3><table>
+<tr><th>Field</th><th>Type</th><th>Rule</th></tr>
+<tr><td>application</td><td>FK Application</td><td>own organization's opportunity only</td></tr>
+<tr><td>representative</td><td>FK User (ORG_REP)</td><td>from session</td></tr>
+<tr><td>suggestion</td><td>CharField enum</td><td>SHORTLIST / SELECT / DECLINE</td></tr>
+<tr><td>rationale</td><td>Text</td><td>required</td></tr>
+<tr><td>created_at</td><td>DateTime</td><td>auto</td></tr>
+</table><div class="rule">Advice only. Never changes Application.status. Latest one is shown to coordinator.</div></div>
+
+<div class="card"><h3>D4 Placement</h3><table>
+<tr><th>Field</th><th>Type</th><th>Rule</th></tr>
+<tr><td>application</td><td>OneToOne Application</td><td>must be SELECTED</td></tr>
+<tr><td>student</td><td>FK User</td><td>copy of application.student (for the one-active rule)</td></tr>
+<tr><td>mentor</td><td>FK User (ORG_REP)</td><td>from opportunity</td></tr>
+<tr><td>start_date, end_date</td><td>Date</td><td>from opportunity</td></tr>
+<tr><td>state</td><td>CharField enum</td><td>ACTIVE / COMPLETED</td></tr>
+<tr><td>completed_by, completed_at</td><td>FK User null / DateTime null</td><td>coordinator only</td></tr>
+</table><div class="rule">At most one ACTIVE placement per student (partial unique index).</div></div>
+
+<div class="card"><h3>D4 LearningGoal</h3><table>
+<tr><th>Field</th><th>Type</th><th>Rule</th></tr>
+<tr><td>placement</td><td>FK Placement</td><td>CASCADE</td></tr>
+<tr><td>position</td><td>small int 1-3</td><td>UNIQUE (placement, position)</td></tr>
+<tr><td>text</td><td>CharField(200)</td><td>required</td></tr>
+</table><div class="rule">2 or 3 goals per placement, checked in the selection service.</div></div>
+
+<div class="card"><h3>D4 CheckIn</h3><table>
+<tr><th>Field</th><th>Type</th><th>Rule</th></tr>
+<tr><td>placement</td><td>FK Placement</td><td>ACTIVE, owned by student</td></tr>
+<tr><td>goal</td><td>FK LearningGoal</td><td>must belong to same placement</td></tr>
+<tr><td>week_start</td><td>Date</td><td>a Monday (project timezone)</td></tr>
+<tr><td>accomplishment, blocker, next_step</td><td>Text (max 1000 each)</td><td>blocker optional</td></tr>
+<tr><td>submitted_at</td><td>DateTime</td><td>server time</td></tr>
+</table><div class="rule">UNIQUE (placement, week_start). Text only, no file uploads.</div></div>
+
+<div class="card"><h3>D4 Feedback</h3><table>
+<tr><th>Field</th><th>Type</th><th>Rule</th></tr>
+<tr><td>checkin</td><td>OneToOne CheckIn</td><td>one reply per check-in (MVP)</td></tr>
+<tr><td>mentor</td><td>FK User</td><td>must equal placement.mentor</td></tr>
+<tr><td>comment</td><td>Text (max 1000)</td><td>required</td></tr>
+<tr><td>responded_at</td><td>DateTime</td><td>auto</td></tr>
+</table></div>
+
+<div class="card"><h3>D5 Notification</h3><table>
+<tr><th>Field</th><th>Type</th><th>Rule</th></tr>
+<tr><td>recipient</td><td>FK User</td><td>CASCADE</td></tr>
+<tr><td>event_type</td><td>CharField enum</td><td>OPP_SUBMITTED / OPP_PUBLISHED / OPP_RETURNED / APP_SUBMITTED / RECOMMENDATION_ADDED / STATUS_CHANGED / PLACEMENT_CREATED / FEEDBACK_ADDED (same list as UA-3 section 7)</td></tr>
+<tr><td>object_type, object_id</td><td>CharField / BigInt</td><td>link target</td></tr>
+<tr><td>created_at, read_at</td><td>DateTime / DateTime null</td><td>null = unread</td></tr>
+</table><div class="rule">Generic text only ("Your application status changed"), no private content.</div></div>
+</div>
+
+<h2 id="enums">3. Status values (must match UI, DFD, tests)</h2>
+<table>
+<tr><th>Object</th><th>Stored value</th><th>Display label</th><th>Allowed moves (from KAN-18)</th></tr>
+<tr><td>Opportunity</td><td><code>DRAFT, PENDING_REVIEW, PUBLISHED, RETURNED, CLOSED</code></td><td>Draft, Pending Review, Published, Returned, Closed</td><td>Draft → Pending Review → Published or Returned; Returned → Pending Review; Published → Closed (coordinator or deadline). Closed is final.</td></tr>
+<tr><td>Application</td><td><code>SUBMITTED, UNDER_REVIEW, SHORTLISTED, SELECTED, DECLINED</code></td><td>Submitted, Under Review, Shortlisted, Selected, Declined</td><td>Submitted → Under Review → Shortlisted / Selected / Declined; Shortlisted → Selected / Declined. Selected and Declined are final.</td></tr>
+<tr><td>Placement</td><td><code>ACTIVE, COMPLETED</code></td><td>Active, Completed</td><td>Created as Active on selection; Active → Completed by coordinator.</td></tr>
+<tr><td>Recommendation</td><td><code>SHORTLIST, SELECT, DECLINE</code></td><td>Shortlist, Select, Decline</td><td>Not a status. Advice only.</td></tr>
+</table>
+
+<h2 id="rules">4. Constraints and indexes</h2>
+<table>
+<tr><th>Rule</th><th>How (Django / PostgreSQL)</th><th>Test</th></tr>
+<tr><td>One application per student per opportunity</td><td><code>UniqueConstraint(student, opportunity)</code></td><td>T2</td></tr>
+<tr><td>One check-in per placement per week</td><td><code>UniqueConstraint(placement, week_start)</code></td><td>T7</td></tr>
+<tr><td>One placement per application</td><td><code>OneToOneField(application)</code></td><td>T5</td></tr>
+<tr><td>At most one ACTIVE placement per student</td><td><code>UniqueConstraint(student, condition=Q(state='ACTIVE'))</code></td><td>T5</td></tr>
+<tr><td>Goal positions unique</td><td><code>UniqueConstraint(placement, position)</code> + <code>CheckConstraint(position 1-3)</code></td><td>-</td></tr>
+<tr><td>Start before end</td><td><code>CheckConstraint(start_date &lt;= end_date)</code></td><td>-</td></tr>
+<tr><td>Status change + event saved together</td><td><code>transaction.atomic()</code> + <code>select_for_update()</code> on the application</td><td>T5</td></tr>
+<tr><td>Fast student listing</td><td>Index on Opportunity (state, deadline)</td><td>NFR4</td></tr>
+<tr><td>Fast applicant / decision lists</td><td>Index on Application (opportunity, status)</td><td>NFR4</td></tr>
+<tr><td>Fast overdue check</td><td>Index on CheckIn (placement, week_start)</td><td>T10</td></tr>
+<tr><td>Unread notices</td><td>Index on Notification (recipient, read_at)</td><td>-</td></tr>
+</table>
+
+<h2 id="perm">5. Permission matrix</h2>
+<p class="note"><b>Default is deny.</b> Anything not marked allowed is refused on the server. "Own" rules are checked against the logged-in user, never against IDs sent from the form. For another user's object, return 404 (not 403) so its existence is not revealed.</p>
+<p class="note"><span class="pill" style="background:var(--y)">Yes</span> allowed <span class="pill" style="background:var(--c)">Own / condition</span> allowed only as written <span class="pill" style="background:var(--n)">No</span> denied</p>
+<table>
+<tr><th>Object</th><th>Action</th><th>Student</th><th>Coordinator</th><th>Org rep / Mentor</th></tr>
+<tr><td rowspan="2">User / Organization</td><td>Create, invite, deactivate</td><td class="n">No</td><td class="y">Yes</td><td class="n">No</td></tr>
+<tr><td>View</td><td class="c">Own profile</td><td class="y">All</td><td class="c">Own profile + own org</td></tr>
+<tr><td rowspan="5">Opportunity</td><td>Create draft</td><td class="n">No</td><td class="n">No</td><td class="c">For own org</td></tr>
+<tr><td>Edit / submit for review</td><td class="n">No</td><td class="n">No</td><td class="c">Own org, only in Draft or Returned</td></tr>
+<tr><td>Approve / return / close</td><td class="n">No</td><td class="y">Yes</td><td class="n">No</td></tr>
+<tr><td>View</td><td class="c">Published and before deadline only</td><td class="y">All states</td><td class="c">Own org, all states</td></tr>
+<tr><td>View review history</td><td class="n">No</td><td class="y">Yes</td><td class="c">Own org</td></tr>
+<tr><td rowspan="3">Application</td><td>Create (apply)</td><td class="c">Self, open opportunity, once</td><td class="n">No</td><td class="n">No</td></tr>
+<tr><td>View</td><td class="c">Own</td><td class="y">All</td><td class="c">Applicants to own org's opportunities</td></tr>
+<tr><td>Change status</td><td class="n">No</td><td class="y">Yes (valid move + reason)</td><td class="n">No</td></tr>
+<tr><td rowspan="2">StatusEvent</td><td>View public reason / next step</td><td class="c">Own applications</td><td class="y">All</td><td class="c">Own org's applications</td></tr>
+<tr><td>View internal note</td><td class="n">No</td><td class="y">Yes</td><td class="n">No</td></tr>
+<tr><td rowspan="2">Recommendation</td><td>Create</td><td class="n">No</td><td class="n">No</td><td class="c">Own org's applications</td></tr>
+<tr><td>View</td><td class="n">No</td><td class="y">All</td><td class="c">Own</td></tr>
+<tr><td rowspan="3">Placement + LearningGoal</td><td>Create (on Selected)</td><td class="n">No</td><td class="y">Yes, via decision</td><td class="n">No</td></tr>
+<tr><td>View</td><td class="c">Own</td><td class="y">All</td><td class="c">Where assigned mentor</td></tr>
+<tr><td>Mark completed</td><td class="n">No</td><td class="y">Yes, after final check-in</td><td class="n">No</td></tr>
+<tr><td rowspan="2">CheckIn</td><td>Create</td><td class="c">Own ACTIVE placement, once per week</td><td class="n">No</td><td class="n">No</td></tr>
+<tr><td>View</td><td class="c">Own</td><td class="y">All</td><td class="c">Where assigned mentor</td></tr>
+<tr><td rowspan="2">Feedback</td><td>Create</td><td class="n">No</td><td class="n">No</td><td class="c">Assigned mentor only</td></tr>
+<tr><td>View</td><td class="c">On own check-ins</td><td class="y">All</td><td class="c">Own</td></tr>
+<tr><td>Notification</td><td>View / mark read</td><td class="c">Own</td><td class="c">Own</td><td class="c">Own</td></tr>
+<tr><td>Needs-action queue</td><td>View</td><td class="n">No</td><td class="y">Yes</td><td class="n">No</td></tr>
+<tr><td>Aggregate export (FR11)</td><td>Download (no names)</td><td class="n">No</td><td class="y">Yes</td><td class="n">No</td></tr>
+</table>
+
+<h2 id="open">6. Open questions (need team decision)</h2>
+<table>
+<tr><th>#</th><th>Question</th><th>Draft choice</th><th>Ask</th></tr>
+<tr><td>1</td><td>Separate mentor role, or ORG_REP acts as mentor?</td><td>ORG_REP is mentor (proposal section 11)</td><td>Kunal</td></tr>
+<tr><td>2</td><td>Can a rep belong to more than one organization?</td><td>No, one org per rep (proposal D1)</td><td>Kunal</td></tr>
+<tr><td>3</td><td>Can a mentor reply to a check-in more than once?</td><td>No, one Feedback per check-in in MVP</td><td>Team</td></tr>
+<tr><td>4</td><td>Is a recommendation required before Decline?</td><td>Required for Select only (KAN-18 proposal)</td><td>Kunal</td></tr>
+<tr><td>5</td><td>OpportunityEvent table OK to add?</td><td>Yes, KAN-18 asks to retain review history</td><td>Tharun</td></tr>
+</table>
+</main>
+<script>mermaid.initialize({startOnLoad:true,theme:'neutral',er:{useMaxWidth:true}});</script>
+</body>
+</html>

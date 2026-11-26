@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Applicants: {{ opportunity.title }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'opportunities:org_list' %}">&larr; Back to my opportunities</a></p>
+<h1>Applicants: {{ opportunity.title }}</h1>
+<p class="lead">Your recommendation is advice to the coordinator, who makes the final decision.</p>
+{% if applications %}
+<ul class="cards">
+  {% for app in applications %}
+  <li class="card">
+    <h2>{{ app.student.name }}</h2>
+    <p class="meta">Year {{ app.student.year_of_study }} | Status: {% include "includes/status.html" with value=app.status label=app.get_status_display %}</p>
+    <h3>Statement</h3>
+    <p>{{ app.statement|linebreaksbr }}</p>
+    <h3>Eligibility answers</h3>
+    <dl class="facts">{% for k, v in app.eligibility_answers.items %}<dt>{{ k|capfirst }}</dt><dd>{{ v }}</dd>{% endfor %}</dl>
+
+    {% if app.my_recommendation %}
+      <p class="panel">You recommended <strong>{{ app.my_recommendation.get_suggestion_display }}</strong> on {{ app.my_recommendation.created_at|date:"j M Y" }}: {{ app.my_recommendation.rationale }}</p>
+    {% endif %}
+    {% if app.status in "SUBMITTED UNDER_REVIEW SHORTLISTED" %}
+    <form method="post" action="{% url 'applications:recommend' app.pk %}" class="stack">{% csrf_token %}
+      <div class="field">
+        <label for="suggestion-{{ app.pk }}">Recommendation <span class="req" aria-hidden="true">*</span></label>
+        <select id="suggestion-{{ app.pk }}" name="suggestion" required>
+          <option value="">Choose...</option><option value="SHORTLIST">Shortlist</option><option value="SELECT">Select</option><option value="DECLINE">Decline</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="rationale-{{ app.pk }}">Why <span class="req" aria-hidden="true">*</span></label>
+        <textarea id="rationale-{{ app.pk }}" name="rationale" required maxlength="1000"></textarea>
+      </div>
+      <button class="btn btn--primary" type="submit">Send recommendation<span class="visually-hidden"> for {{ app.student.name }}</span></button>
+    </form>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="empty">No applications yet.</p>
+{% endif %}
+{% endblock %}

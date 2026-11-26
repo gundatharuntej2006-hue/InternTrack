@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Weekly check-in{% endblock %}
+{% block content %}
+<p><a href="{% url 'placements:my_placement' %}">&larr; Back to my placement</a></p>
+<h1>Weekly check-in</h1>
+<p class="lead">Week of {{ week_start|date:"j M Y" }}. One check-in per week. Do not include confidential client details.</p>
+
+{% include "includes/form_errors.html" with form=form %}
+<form class="stack" method="post" novalidate>
+  {% csrf_token %}
+  {% include "includes/field.html" with field=form.goal %}
+  {% include "includes/field.html" with field=form.accomplishment %}
+  {% include "includes/field.html" with field=form.blocker %}
+  {% include "includes/field.html" with field=form.next_step %}
+  <div class="actions">
+    <button class="btn btn--primary" type="submit">Submit check-in</button>
+    <a class="btn" href="{% url 'placements:my_placement' %}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

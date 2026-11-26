@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     DJANGO_DEBUG=(bool, False),
     DJANGO_ALLOWED_HOSTS=(list, ["localhost", "127.0.0.1"]),
-    DJANGO_TIME_ZONE=(str, "UTC"),
+    DJANGO_TIME_ZONE=(str, "Asia/Kolkata"),
     POSTGRES_HOST=(str, "127.0.0.1"),
     POSTGRES_PORT=(int, 5432),
     POSTGRES_CONNECT_TIMEOUT=(int, 5),
@@ -126,6 +126,8 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+# Project-wide static files (shared CSS for all templates).
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 
 # --- Logging -----------------------------------------------------------------

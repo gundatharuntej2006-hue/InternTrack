@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Notices{% endblock %}
+{% block content %}
+<h1>Notices</h1>
+{% if notices %}
+<form method="post">{% csrf_token %}<button class="btn" type="submit" name="mark_all_read" value="1">Mark all as read</button></form>
+<ul class="cards" style="margin-top:12px">
+  {% for n in notices %}
+  <li class="card">
+    <p>{% if not n.read_at %}<strong>New:</strong> {% endif %}<a href="{{ n.url }}">{{ n.message }}</a></p>
+    <p class="meta"><time datetime="{{ n.created_at|date:'c' }}">{{ n.created_at|date:"j M Y, H:i" }}</time></p>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="empty">You have no notices.</p>
+{% endif %}
+{% endblock %}

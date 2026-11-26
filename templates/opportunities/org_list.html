@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}My opportunities{% endblock %}
+{% block content %}
+<h1>My organization's opportunities</h1>
+<p class="actions"><a class="btn btn--primary" href="{% url 'opportunities:create' %}">+ New opportunity</a></p>
+{% if opportunities %}
+<div class="tablewrap">
+<table class="data" aria-label="My opportunities">
+  <thead><tr><th scope="col">Title</th><th scope="col">Status</th><th scope="col">Deadline</th><th scope="col">Applicants</th><th scope="col">Action</th></tr></thead>
+  <tbody>
+  {% for opp in opportunities %}
+    <tr>
+      <td>{% if opp.state == "DRAFT" or opp.state == "RETURNED" %}<a href="{% url 'opportunities:edit' opp.pk %}">{{ opp.title }}</a>{% else %}{{ opp.title }}{% endif %}</td>
+      <td>{% include "includes/status.html" with value=opp.state label=opp.get_state_display %}
+        {% if opp.state == "RETURNED" and opp.return_reason %}<br><span class="meta">Returned because: {{ opp.return_reason }}</span>{% endif %}</td>
+      <td>{{ opp.deadline|date:"j M Y, H:i T" }}</td>
+      <td>{% if opp.applicant_count %}<a href="{% url 'applications:applicants' opp.pk %}">{{ opp.applicant_count }}<span class="visually-hidden"> applicants for {{ opp.title }}</span></a>{% else %}0{% endif %}</td>
+      <td>{% if opp.state == "DRAFT" or opp.state == "RETURNED" %}<a class="btn" href="{% url 'opportunities:edit' opp.pk %}">Edit<span class="visually-hidden"> {{ opp.title }}</span></a>{% endif %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="empty">No opportunities yet. Create one to send to the coordinator for review.</p>
+{% endif %}
+{% endblock %}
