@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}My applications{% endblock %}
+{% block content %}
+<h1>My applications</h1>
+{% if applications %}
+<ul class="cards">
+  {% for app in applications %}
+  <li class="card">
+    <h2>{{ app.opportunity.title }}</h2>
+    <p class="meta">{{ app.opportunity.organization.name }} | Current status:
+      {% include "includes/status.html" with value=app.status label=app.get_status_display %}</p>
+
+    <h3 class="visually-hidden">Status history</h3>
+    <ol class="timeline">
+      {% for event in app.public_events %}
+      <li>
+        <time datetime="{{ event.created_at|date:'c' }}">{{ event.created_at|date:"j M Y, H:i" }}</time>
+        &ndash; <strong>{{ event.get_to_status_display }}</strong> <span class="meta">({{ event.actor_role }})</span>
+        {% if event.public_reason %}<br>Reason: {{ event.public_reason }}{% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+
+    <div class="nextstep"><strong>Next step:</strong> {{ app.public_next_step }}</div>
+    {% if app.status == "SELECTED" %}
+    <div class="actions"><a class="btn btn--primary" href="{% url 'placements:my_placement' %}">Go to my placement</a></div>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="empty">You have not applied to any opportunity yet. <a href="{% url 'opportunities:list' %}">Browse opportunities</a>.</p>
+{% endif %}
+{% endblock %}

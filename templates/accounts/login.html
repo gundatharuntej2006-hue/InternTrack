@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+<h1>Sign in</h1>
+<p class="lead">Use the university email your coordinator invited. There is no public sign-up.</p>
+{% include "includes/form_errors.html" with form=form %}
+<form class="stack" method="post" action="{% url 'accounts:login' %}" novalidate>
+  {% csrf_token %}
+  {% include "includes/field.html" with field=form.username %}
+  {% include "includes/field.html" with field=form.password %}
+  <input type="hidden" name="next" value="{{ next }}">
+  <div class="actions"><button class="btn btn--primary" type="submit">Sign in</button></div>
+</form>
+{% endblock %}

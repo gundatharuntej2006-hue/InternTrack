@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Decision: {{ application.student.name }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'applications:review_list' %}">&larr; Back to applications</a></p>
+<h1>Decision: {{ application.student.name }}</h1>
+<p class="lead">{{ application.opportunity.title }} ({{ application.opportunity.organization.name }}) | Current status:
+  {% include "includes/status.html" with value=application.status label=application.get_status_display %}</p>
+
+<div class="panel">
+  <h2>Mentor for this placement</h2>
+  {% if application.opportunity.mentor %}
+    <p>If you select this student, <strong>{{ application.opportunity.mentor.name }}</strong> ({{ application.opportunity.organization.name }}) is assigned as mentor. This comes from the approved opportunity.</p>
+  {% else %}
+    <p class="error"><strong>No mentor is set on this opportunity.</strong> Ask the organization to add one before selecting a student.</p>
+  {% endif %}
+  <h2>Application</h2>
+  <p>{{ application.statement|linebreaksbr }}</p>
+  <h2>Organization recommendation</h2>
+  {% if recommendation %}
+    <p><strong>{{ recommendation.get_suggestion_display }}</strong> by {{ recommendation.representative.name }} on {{ recommendation.created_at|date:"j M Y" }}</p>
+    <p>{{ recommendation.rationale }}</p>
+  {% else %}
+    <p class="meta">No recommendation yet. A recommendation is needed before selecting.</p>
+  {% endif %}
+</div>
+
+{% include "includes/form_errors.html" with form=form %}
+<form class="stack" method="post" novalidate>
+  {% csrf_token %}
+  {% include "includes/field.html" with field=form.new_status %}
+  {% include "includes/field.html" with field=form.public_reason %}
+  {% include "includes/field.html" with field=form.public_next_step %}
+  {% include "includes/field.html" with field=form.internal_note %}
+  <fieldset>
+    <legend>Learning goals (only when Selected: 2 or 3)</legend>
+    {% include "includes/field.html" with field=form.goal_1 %}
+    {% include "includes/field.html" with field=form.goal_2 %}
+    {% include "includes/field.html" with field=form.goal_3 %}
+  </fieldset>
+  <div class="actions"><button class="btn btn--primary" type="submit">Confirm decision</button></div>
+</form>
+
+<h2>History</h2>
+<ol class="timeline">
+  {% for event in events %}
+  <li><time datetime="{{ event.created_at|date:'c' }}">{{ event.created_at|date:"j M Y, H:i" }}</time> &ndash; <strong>{{ event.get_to_status_display }}</strong> by {{ event.actor.name }}
+    {% if event.public_reason %}<br>Public reason: {{ event.public_reason }}{% endif %}
+    {% if event.internal_note %}<br><em>Internal note: {{ event.internal_note }}</em>{% endif %}</li>
+  {% endfor %}
+</ol>
+{% endblock %}

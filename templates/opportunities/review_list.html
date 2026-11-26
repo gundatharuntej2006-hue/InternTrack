@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Opportunities to review{% endblock %}
+{% block content %}
+<h1>Opportunities waiting for review</h1>
+{% if opportunities %}
+<ul class="cards">
+  {% for opp in opportunities %}
+  <li class="card">
+    <h2>{{ opp.title }}</h2>
+    <p class="meta">{{ opp.organization.name }} | {% include "includes/status.html" with value=opp.state label=opp.get_state_display %}</p>
+    <dl class="facts">
+      <dt>Mode</dt><dd>{{ opp.get_mode_display }}{% if opp.location %}, {{ opp.location }}{% endif %}</dd>
+      <dt>Dates</dt><dd>{{ opp.start_date|date:"j M Y" }} to {{ opp.end_date|date:"j M Y" }}</dd>
+      <dt>Deadline</dt><dd>{{ opp.deadline|date:"j M Y, H:i T" }}</dd>
+      <dt>Mentor</dt><dd>{{ opp.mentor.name }}</dd>
+      <dt>Eligibility</dt><dd>{{ opp.eligibility }}</dd>
+      <dt>Description</dt><dd>{{ opp.description|linebreaksbr }}</dd>
+    </dl>
+    <div class="actions">
+      <form class="inline" method="post" action="{% url 'opportunities:approve' opp.pk %}">{% csrf_token %}
+        <button class="btn btn--primary" type="submit">Approve and publish</button>
+      </form>
+    </div>
+    <form method="post" action="{% url 'opportunities:return' opp.pk %}" class="stack">{% csrf_token %}
+      <div class="field">
+        <label for="reason-{{ opp.pk }}">Reason for returning (organization will see this) <span class="req" aria-hidden="true">*</span></label>
+        <textarea id="reason-{{ opp.pk }}" name="reason" required maxlength="1000"></textarea>
+      </div>
+      <button class="btn" type="submit">Return to organization</button>
+    </form>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="empty">No opportunities are waiting for review.</p>
+{% endif %}
+
+{% if published %}
+<h2>Published opportunities</h2>
+<div class="tablewrap">
+<table class="data" aria-label="Published opportunities">
+  <thead><tr><th scope="col">Title</th><th scope="col">Organization</th><th scope="col">Deadline</th><th scope="col">Close early</th></tr></thead>
+  <tbody>
+  {% for opp in published %}
+    <tr>
+      <td>{{ opp.title }}</td><td>{{ opp.organization.name }}</td><td>{{ opp.deadline|date:"j M Y, H:i T" }}</td>
+      <td>
+        <form method="post" action="{% url 'opportunities:close' opp.pk %}">{% csrf_token %}
+          <label class="visually-hidden" for="close-{{ opp.pk }}">Reason for closing {{ opp.title }}</label>
+          <input id="close-{{ opp.pk }}" name="reason" required maxlength="500" placeholder="Reason">
+          <button class="btn btn--danger" type="submit">Close</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InternTrack Architecture</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<style>
+:root{--ink:#1f2937;--muted:#6b7280;--line:#cbd5e1;--head:#1b2b45;--alt:#f5f7fa}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 system-ui,Segoe UI,Arial,sans-serif;color:var(--ink);background:#fff}
+header{background:var(--head);color:#fff;padding:18px 24px}
+header h1{margin:0;font-size:20px}header p{margin:4px 0 0;opacity:.85}
+nav{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:8px 24px;display:flex;gap:14px;flex-wrap:wrap;z-index:5}
+nav a{color:var(--head);font-weight:600;text-decoration:none}
+main{max-width:1180px;margin:0 auto;padding:16px}
+h2{color:var(--head);border-bottom:2px solid var(--head);padding-bottom:4px;margin-top:34px;scroll-margin-top:50px}
+h3{margin:20px 0 6px}
+.note{color:var(--muted);font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0 14px}
+th,td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+th{background:var(--head);color:#fff}
+tr:nth-child(even) td{background:var(--alt)}
+code{font-family:Consolas,monospace;font-size:12.5px;background:#eef2f7;padding:0 3px;border-radius:3px}
+.mermaid{border:1px solid var(--line);border-radius:8px;padding:10px;overflow-x:auto;background:#fff}
+@media (max-width:600px){main{padding:10px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>InternTrack - UA-3 Architecture, deployment and handoff contracts</h1>
+  <p>Member 3 (UI Design and Architecture) | Draft v0.1 | Builds on UA-1 (screens) and UA-2 (schema) | Django 5.2 + PostgreSQL</p>
+</header>
+<nav>
+  <a href="#arch">1. Architecture</a><a href="#deploy">2. Deployment</a><a href="#apps">3. Code layout</a>
+  <a href="#urls">4. URL contract</a><a href="#forms">5. Form contract</a><a href="#labels">6. Labels + messages</a><a href="#notif">7. Notifications</a><a href="#seq">8. Sequence diagrams</a>
+</nav>
+<main>
+
+<h2 id="arch">1. Architecture (one server-rendered Django app)</h2>
+<div class="mermaid">
+flowchart TB
+  U["Browser: Student / Coordinator / Org rep-Mentor"]
+  MW["Middleware: session, CSRF, security headers, login rate limit"]
+  V["Views + forms: validate input"]
+  P["Permission layer: role + ownership, default deny"]
+  SV["Services: opportunity, application, placement, check-in, queue, notifications"]
+  DB[("PostgreSQL: 12 tables from UA-2")]
+  T["Templates: accessible HTML, little JS"]
+  U -- "HTTPS: pages + form POST" --> MW --> V --> P --> SV
+  SV -- "ORM, transaction.atomic" --> DB
+  V --> T -- "HTML response" --> U
+</div>
+<table>
+<tr><th>Layer</th><th>Responsibility</th><th>Rule</th></tr>
+<tr><td>Browser</td><td>Shows pages, sends forms</td><td>No business logic in JavaScript</td></tr>
+<tr><td>Middleware</td><td>Session cookie, CSRF token, HTTPS headers, login rate limit</td><td>Secure + HttpOnly cookies (NFR1)</td></tr>
+<tr><td>Views + forms</td><td>Read request, validate fields, pick template</td><td>Never trust ids for the actor; take user from session</td></tr>
+<tr><td>Permission layer</td><td>Check role and ownership for every object (UA-2 matrix)</td><td>Deny by default; 404 for other users' objects</td></tr>
+<tr><td>Services</td><td>State changes, events, placement creation, overdue calculation, notices</td><td>Each state change = one transaction with its event</td></tr>
+<tr><td>PostgreSQL</td><td>All data, constraints, indexes</td><td>Only store; no files in MVP</td></tr>
+</table>
+
+<h2 id="deploy">2. Deployment</h2>
+<div class="mermaid">
+flowchart LR
+  subgraph Dev["Developer laptop"]
+    D1["Django runserver"] --> D2[("PostgreSQL in Docker")]
+  end
+  subgraph Demo["Demo server (approved VM) or local fallback"]
+    N["HTTPS reverse proxy"] --> G["Gunicorn + Django (DEBUG off)"] --> P2[("PostgreSQL")]
+    G --> ST["Static files"]
+    P2 --> BK["Daily backup + one restore drill"]
+  end
+  GH["GitHub repo + CI tests"] --> Demo
+</div>
+<table>
+<tr><th>Item</th><th>Setting</th></tr>
+<tr><td>Secrets</td><td>Environment variables (<code>SECRET_KEY</code>, <code>DATABASE_URL</code>), never in git</td></tr>
+<tr><td>Production check</td><td><code>python manage.py check --deploy</code> passes</td></tr>
+<tr><td>Data</td><td>Synthetic demo data only (seed script), no real student records</td></tr>
+<tr><td>Fallback</td><td>If no approved server: run the same setup locally for the demo</td></tr>
+</table>
+
+<h2 id="apps">3. Code layout (Django apps)</h2>
+<table>
+<tr><th>App</th><th>Models (UA-2)</th><th>Screens (UA-1)</th></tr>
+<tr><td><code>accounts</code></td><td>User, Organization</td><td>L1 Login</td></tr>
+<tr><td><code>opportunities</code></td><td>Opportunity, OpportunityEvent</td><td>S1, S2, O1, O2, C2</td></tr>
+<tr><td><code>applications</code></td><td>Application, StatusEvent, Recommendation</td><td>S3, S4, O3, C3, C4</td></tr>
+<tr><td><code>placements</code></td><td>Placement, LearningGoal, CheckIn, Feedback</td><td>S5, S6, O4, C5</td></tr>
+<tr><td><code>dashboard</code></td><td>Notification</td><td>C1 queue, notices list</td></tr>
+<tr><td><code>core</code></td><td>-</td><td>base template, permission helpers, enums</td></tr>
+</table>
+
+<h2 id="urls">4. URL contract (one row per screen / action)</h2>
+<p class="note">All URLs need login except <code>/login/</code>. Every POST needs a CSRF token and redirects after success (no double submit on refresh).</p>
+<table>
+<tr><th>Screen</th><th>URL</th><th>Method</th><th>Role</th><th>Template</th><th>Result</th></tr>
+<tr><td>L1 Login</td><td><code>/login/</code>, <code>/logout/</code></td><td>GET, POST</td><td>All</td><td><code>accounts/login.html</code></td><td>Redirect to role home</td></tr>
+<tr><td>Notices</td><td><code>/notices/</code></td><td>GET, POST (mark read)</td><td>All</td><td><code>dashboard/notices.html</code></td><td>Own notices only</td></tr>
+<tr><td>S1 Opportunity list</td><td><code>/opportunities/?q=&amp;mode=&amp;location=</code></td><td>GET</td><td>Student</td><td><code>opportunities/list.html</code></td><td>Published + open only, paginated 20</td></tr>
+<tr><td>S2 Detail</td><td><code>/opportunities/&lt;id&gt;/</code></td><td>GET</td><td>Student</td><td><code>opportunities/detail.html</code></td><td>404 if not published/open</td></tr>
+<tr><td>S3 Apply</td><td><code>/opportunities/&lt;id&gt;/apply/</code></td><td>GET, POST</td><td>Student</td><td><code>applications/apply.html</code></td><td>Creates Submitted + event → S4</td></tr>
+<tr><td>S4 My applications</td><td><code>/my/applications/</code></td><td>GET</td><td>Student</td><td><code>applications/my_list.html</code></td><td>Own applications + public timeline</td></tr>
+<tr><td>S5 My placement</td><td><code>/my/placement/</code></td><td>GET</td><td>Student</td><td><code>placements/my_placement.html</code></td><td>Active placement, or the latest Completed one read-only (goals, check-ins, mentor feedback stay visible)</td></tr>
+<tr><td>S6 Check-in</td><td><code>/my/placement/checkin/</code></td><td>GET, POST</td><td>Student</td><td><code>placements/checkin_form.html</code></td><td>One per week → S5</td></tr>
+<tr><td>C1 Needs action</td><td><code>/coordinator/</code></td><td>GET</td><td>Coordinator</td><td><code>dashboard/queue.html</code></td><td>Counts + item list</td></tr>
+<tr><td>C2 Pending opportunities</td><td><code>/coordinator/opportunities/</code></td><td>GET</td><td>Coordinator</td><td><code>opportunities/review_list.html</code></td><td>Pending Review items</td></tr>
+<tr><td>C2 Approve / return / close</td><td><code>/coordinator/opportunities/&lt;id&gt;/approve|return|close/</code></td><td>POST</td><td>Coordinator</td><td>-</td><td>State + OpportunityEvent → C2</td></tr>
+<tr><td>C3 Applications</td><td><code>/coordinator/applications/?opportunity=&amp;status=</code></td><td>GET</td><td>Coordinator</td><td><code>applications/review_list.html</code></td><td>With latest recommendation</td></tr>
+<tr><td>C4 Decision</td><td><code>/coordinator/applications/&lt;id&gt;/decide/</code></td><td>GET, POST</td><td>Coordinator</td><td><code>applications/decide.html</code></td><td>Status + event (+ placement + goals if Selected) → C3. Shows the mentor inherited from the approved opportunity; error if none is set</td></tr>
+<tr><td>C5 Placements</td><td><code>/coordinator/placements/?overdue=1</code></td><td>GET</td><td>Coordinator</td><td><code>placements/list.html</code></td><td>Overdue flag as text</td></tr>
+<tr><td>C5 Complete</td><td><code>/coordinator/placements/&lt;id&gt;/complete/</code></td><td>POST</td><td>Coordinator</td><td>-</td><td>Active → Completed</td></tr>
+<tr><td>Export (FR11)</td><td><code>/coordinator/export.csv</code></td><td>GET</td><td>Coordinator</td><td>-</td><td>Counts only, no names</td></tr>
+<tr><td>O1 My opportunities</td><td><code>/org/opportunities/</code></td><td>GET</td><td>Org rep</td><td><code>opportunities/org_list.html</code></td><td>Own org, all states</td></tr>
+<tr><td>O2 New / edit draft</td><td><code>/org/opportunities/new/</code>, <code>/org/opportunities/&lt;id&gt;/edit/</code></td><td>GET, POST</td><td>Org rep</td><td><code>opportunities/form.html</code></td><td>Edit only in Draft/Returned</td></tr>
+<tr><td>O2 Submit for review</td><td><code>/org/opportunities/&lt;id&gt;/submit/</code></td><td>POST</td><td>Org rep</td><td>-</td><td>Draft/Returned → Pending Review</td></tr>
+<tr><td>O3 Applicants</td><td><code>/org/opportunities/&lt;id&gt;/applicants/</code></td><td>GET</td><td>Org rep</td><td><code>applications/applicants.html</code></td><td>Own org only, no internal notes</td></tr>
+<tr><td>O3 Recommend</td><td><code>/org/applications/&lt;id&gt;/recommend/</code></td><td>POST</td><td>Org rep</td><td>-</td><td>Recommendation saved → O3</td></tr>
+<tr><td>O4 Check-ins</td><td><code>/mentor/checkins/</code></td><td>GET</td><td>Mentor</td><td><code>placements/mentor_checkins.html</code></td><td>Assigned placements only</td></tr>
+<tr><td>O4 Feedback</td><td><code>/mentor/checkins/&lt;id&gt;/feedback/</code></td><td>POST</td><td>Mentor</td><td>-</td><td>One reply → O4</td></tr>
+</table>
+
+<h2 id="forms">5. Form contract (fields and validation)</h2>
+<h3>Opportunity form (O2)</h3>
+<table>
+<tr><th>Field</th><th>Input</th><th>Validation</th></tr>
+<tr><td>title</td><td>text</td><td>required, max 150</td></tr>
+<tr><td colspan="3"><strong>Save draft</strong> needs only title + mode, so partial work can be saved and reopened. <strong>Submit for review</strong> needs every field below; on errors the opportunity stays Draft/Returned (form flag <code>submitting=True</code>).</td></tr>
+<tr><td>description</td><td>textarea</td><td>required to submit</td></tr>
+<tr><td>eligibility</td><td>textarea</td><td>required to submit</td></tr>
+<tr><td>mode</td><td>select Remote / On-site / Hybrid</td><td>required</td></tr>
+<tr><td>location</td><td>text</td><td>required unless Remote</td></tr>
+<tr><td>start_date, end_date</td><td>date</td><td>required to submit; start &lt;= end</td></tr>
+<tr><td>deadline</td><td>date + time, IST (Asia/Kolkata)</td><td>required to submit; in the future when submitted. Shown everywhere as e.g. "5 Dec 2026, 17:00 IST"; applications close at that exact instant</td></tr>
+<tr><td>mentor</td><td>select (reps of own org)</td><td>required to submit; must belong to same organization. Inherited by the placement on Select (no separate choice at C4)</td></tr>
+</table>
+<h3>Application form (S3)</h3>
+<table>
+<tr><th>Field</th><th>Input</th><th>Validation</th></tr>
+<tr><td>statement</td><td>textarea</td><td>required, max 1000</td></tr>
+<tr><td>year_of_study</td><td>select 1-5</td><td>required</td></tr>
+<tr><td>skills</td><td>text</td><td>max 300</td></tr>
+<tr><td>(hidden) student, opportunity</td><td>-</td><td>from session and URL, never from form; open + not already applied</td></tr>
+</table>
+<h3>Recommendation form (O3)</h3>
+<table>
+<tr><th>Field</th><th>Input</th><th>Validation</th></tr>
+<tr><td>suggestion</td><td>select Shortlist / Select / Decline</td><td>required</td></tr>
+<tr><td>rationale</td><td>textarea</td><td>required, max 1000</td></tr>
+</table>
+<h3>Decision form (C4)</h3>
+<table>
+<tr><th>Field</th><th>Input</th><th>Validation</th></tr>
+<tr><td>new_status</td><td>select (only allowed next statuses)</td><td>must be a valid move from KAN-18</td></tr>
+<tr><td>public_reason</td><td>textarea</td><td>required, max 500</td></tr>
+<tr><td>public_next_step</td><td>text</td><td>required, max 300</td></tr>
+<tr><td>internal_note</td><td>textarea</td><td>optional, never shown to student</td></tr>
+<tr><td>goal_1, goal_2, goal_3</td><td>text</td><td>only for Selected: goal_1 + goal_2 required, max 200 each</td></tr>
+</table>
+<h3>Opportunity review (C2), Check-in (S6), Feedback (O4)</h3>
+<table>
+<tr><th>Form</th><th>Fields</th><th>Validation</th></tr>
+<tr><td>Return / close (C2)</td><td>reason</td><td>required for Return and Close</td></tr>
+<tr><td>Check-in (S6)</td><td>goal (select own goals), accomplishment, blocker, next_step</td><td>goal from own placement; accomplishment + next_step required; max 1000 each; one per week</td></tr>
+<tr><td>Feedback (O4)</td><td>comment</td><td>required, max 1000; assigned mentor only; one per check-in</td></tr>
+</table>
+
+<h2 id="labels">6. Status labels and messages (same text everywhere)</h2>
+<table>
+<tr><th>Stored value</th><th>Label shown</th><th>Student next-step default</th></tr>
+<tr><td><code>SUBMITTED</code></td><td>Submitted</td><td>Application received. Wait for coordinator review.</td></tr>
+<tr><td><code>UNDER_REVIEW</code></td><td>Under Review</td><td>Your application is being reviewed. No action is required now.</td></tr>
+<tr><td><code>SHORTLISTED</code></td><td>Shortlisted</td><td>You have been shortlisted. Follow the coordinator's next-step instructions.</td></tr>
+<tr><td><code>SELECTED</code></td><td>Selected</td><td>Selection confirmed. Open your placement and review your learning goals.</td></tr>
+<tr><td><code>DECLINED</code></td><td>Declined</td><td>You were not selected for this opportunity. You may review other open opportunities.</td></tr>
+<tr><td><code>DRAFT / PENDING_REVIEW / PUBLISHED / RETURNED / CLOSED</code></td><td>Draft / Pending Review / Published / Returned / Closed</td><td>Organization and coordinator only</td></tr>
+<tr><td><code>ACTIVE / COMPLETED</code></td><td>Active / Completed</td><td>Placement</td></tr>
+</table>
+<p class="note">Wording from KAN-18. Labels are always text, never colour only.</p>
+<h3>Error messages</h3>
+<table>
+<tr><th>Case</th><th>Message</th><th>Test</th></tr>
+<tr><td>Already applied</td><td>You have already applied to this opportunity.</td><td>T2</td></tr>
+<tr><td>Deadline passed</td><td>The deadline has passed. Applications are closed.</td><td>T2</td></tr>
+<tr><td>Not allowed / not yours</td><td>Page not found. (404)</td><td>T3, T6, T8</td></tr>
+<tr><td>Invalid status move</td><td>This application cannot move from &lt;current&gt; to &lt;new&gt;.</td><td>-</td></tr>
+<tr><td>Already decided / active placement exists</td><td>This application was already decided. / The student already has an active placement.</td><td>T5</td></tr>
+<tr><td>Check-in already sent</td><td>You already submitted a check-in for this week.</td><td>T7</td></tr>
+<tr><td>Login failed / locked</td><td>Email or password is incorrect. / Too many attempts, wait 1 minute.</td><td>NFR1</td></tr>
+</table>
+
+<h2 id="notif">7. In-app notifications (FR10)</h2>
+<p>Event values match <code>Notification.event_type</code> in UA-2.</p>
+<table>
+<tr><th>Event (<code>event_type</code>)</th><th>Who gets it</th><th>Text (no private details)</th></tr>
+<tr><td>Opportunity submitted (<code>OPP_SUBMITTED</code>)</td><td>Coordinators</td><td>An opportunity is waiting for review.</td></tr>
+<tr><td>Opportunity published (<code>OPP_PUBLISHED</code>)</td><td>Owning org reps <strong>and eligible students</strong> (AC10.1)</td><td>Your opportunity was published. / A new internship is open: &lt;title&gt;.</td></tr>
+<tr><td>Opportunity returned (<code>OPP_RETURNED</code>)</td><td>Owning org reps</td><td>Your opportunity was returned with a comment.</td></tr>
+<tr><td>Application submitted (<code>APP_SUBMITTED</code>)</td><td>Owning org reps</td><td>A new application was received.</td></tr>
+<tr><td>Recommendation added (<code>RECOMMENDATION_ADDED</code>)</td><td>Coordinators</td><td>A recommendation is waiting for your decision.</td></tr>
+<tr><td>Status changed (<code>STATUS_CHANGED</code>)</td><td>Student</td><td>Your application status changed.</td></tr>
+<tr><td>Placement created (<code>PLACEMENT_CREATED</code>)</td><td>Student, mentor</td><td>A placement has been created.</td></tr>
+<tr><td>Feedback added (<code>FEEDBACK_ADDED</code>)</td><td>Student</td><td>Your mentor replied to your check-in.</td></tr>
+</table>
+<p>"Eligible students" means active STUDENT accounts. Eligibility is free text in the MVP, so it is not filtered automatically.</p>
+
+<h2 id="seq">8. Sequence diagrams</h2>
+<h3>8.1 Org rep submits, coordinator publishes (FR2, FR3)</h3>
+<pre class="mermaid">
+sequenceDiagram
+  actor R as Org rep
+  participant V as opportunities views
+  participant S as opportunity service
+  participant DB as PostgreSQL
+  actor C as Coordinator
+  R->>V: POST new opportunity (action=save)
+  V->>S: save_draft(form)
+  S->>DB: INSERT Opportunity (DRAFT)
+  R->>V: POST edit (action=submit)
+  V->>V: OpportunityForm(submitting=True).is_valid()
+  V->>S: submit(opportunity)
+  S->>DB: DRAFT to PENDING_REVIEW, OpportunityEvent, Notification OPP_SUBMITTED
+  C->>V: POST approve
+  V->>S: approve(opportunity, coordinator)
+  S->>DB: PENDING_REVIEW to PUBLISHED, event, Notification OPP_PUBLISHED to reps and students
+  V-->>C: redirect to review list with message
+</pre>
+<h3>8.2 Student applies (FR4, FR5)</h3>
+<pre class="mermaid">
+sequenceDiagram
+  actor St as Student
+  participant V as applications views
+  participant S as application service
+  participant DB as PostgreSQL
+  St->>V: GET apply page
+  V->>DB: opportunity PUBLISHED and deadline not passed?
+  St->>V: POST ApplicationForm
+  V->>S: apply(student, opportunity, data)
+  S->>DB: BEGIN, check deadline and unique(student, opportunity)
+  alt already applied or closed
+    S-->>V: error
+    V-->>St: form error, nothing saved
+  else ok
+    S->>DB: INSERT Application (SUBMITTED), ApplicationEvent, Notification APP_SUBMITTED, COMMIT
+    V-->>St: redirect to My applications
+  end
+</pre>
+<h3>8.3 Recommendation, decision and placement (FR6, FR7)</h3>
+<pre class="mermaid">
+sequenceDiagram
+  actor R as Org rep
+  actor C as Coordinator
+  participant V as views
+  participant S as application service
+  participant DB as PostgreSQL
+  R->>V: POST recommend (Shortlist, Select or Decline + rationale)
+  V->>S: recommend(application, rep)
+  S->>DB: INSERT Recommendation, Notification RECOMMENDATION_ADDED
+  C->>V: POST decide
+  V->>S: decide(application, new_status, reasons, goals)
+  S->>DB: BEGIN, lock application, check allowed move and recommendation exists for Select
+  alt Selected
+    S->>DB: SELECTED + event, INSERT Placement (ACTIVE, mentor = opportunity.mentor) + 2-3 LearningGoals
+    S->>DB: Notification STATUS_CHANGED and PLACEMENT_CREATED, COMMIT
+  else Declined, Shortlisted or Under Review
+    S->>DB: new status + event (public reason, internal note), Notification STATUS_CHANGED, COMMIT
+  end
+  V-->>C: redirect to applications list
+</pre>
+<h3>8.4 Weekly check-in and mentor feedback (FR8, FR9)</h3>
+<pre class="mermaid">
+sequenceDiagram
+  actor St as Student
+  actor M as Mentor (org rep)
+  participant V as placements views
+  participant DB as PostgreSQL
+  St->>V: POST check-in
+  V->>DB: placement ACTIVE and no check-in this week?
+  V->>DB: INSERT CheckIn (week_start)
+  M->>V: GET mentor check-ins
+  V->>DB: check-ins where placement.mentor = M
+  M->>V: POST feedback
+  V->>DB: INSERT Feedback (mentor = placement.mentor), Notification FEEDBACK_ADDED
+  St->>V: GET my placement
+  V-->>St: check-ins with feedback, mentor name and date
+</pre>
+</main>
+<script>mermaid.initialize({startOnLoad:true,theme:'neutral'});</script>
+</body>
+</html>

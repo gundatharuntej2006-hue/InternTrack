@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ opportunity.title }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'opportunities:list' %}">&larr; Back to opportunities</a></p>
+<h1>{{ opportunity.title }}</h1>
+<p class="lead">{{ opportunity.organization.name }}</p>
+
+<dl class="facts">
+  <dt>Mode</dt><dd>{{ opportunity.get_mode_display }}{% if opportunity.location %}, {{ opportunity.location }}{% endif %}</dd>
+  <dt>Dates</dt><dd>{{ opportunity.start_date|date:"j M Y" }} to {{ opportunity.end_date|date:"j M Y" }}</dd>
+  <dt>Apply by</dt><dd><time datetime="{{ opportunity.deadline|date:'c' }}">{{ opportunity.deadline|date:"j M Y, H:i T" }}</time></dd>
+</dl>
+
+<h2>Description</h2>
+<p>{{ opportunity.description|linebreaksbr }}</p>
+<h2>Eligibility</h2>
+<p>{{ opportunity.eligibility|linebreaksbr }}</p>
+
+<div class="panel">
+{% if existing_application %}
+  <p><strong>You applied on {{ existing_application.submitted_at|date:"j M Y" }}.</strong>
+  Current status: {% include "includes/status.html" with value=existing_application.status label=existing_application.get_status_display %}</p>
+  <a class="btn" href="{% url 'applications:my_list' %}">See my applications</a>
+{% elif is_open %}
+  <a class="btn btn--primary" href="{% url 'applications:apply' opportunity.pk %}">Apply for this internship</a>
+{% else %}
+  <p><strong>Applications are closed.</strong> The deadline has passed.</p>
+{% endif %}
+</div>
+{% endblock %}

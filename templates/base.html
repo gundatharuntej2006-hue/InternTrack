@@ -1,0 +1,54 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}InternTrack{% endblock %} | InternTrack</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+<header class="topbar">
+  <div class="inner">
+    <a class="logo" href="/">InternTrack</a>
+    {% if user.is_authenticated %}
+    {# "url ... as" returns an empty value instead of failing when a URL is not built yet, so unfinished pages are simply left out of the menu. #}
+    {% url 'opportunities:list' as u_opp_list %}{% url 'applications:my_list' as u_my_apps %}{% url 'placements:my_placement' as u_my_placement %}
+    {% url 'dashboard:queue' as u_queue %}{% url 'opportunities:review_list' as u_opp_review %}{% url 'applications:review_list' as u_app_review %}{% url 'placements:list' as u_placements %}
+    {% url 'opportunities:org_list' as u_org_opps %}{% url 'placements:mentor_checkins' as u_mentor %}
+    {% url 'dashboard:notices' as u_notices %}{% url 'accounts:logout' as u_logout %}
+    <nav class="mainnav" aria-label="Main">
+      <ul>
+        {% if user.role == "STUDENT" %}
+          {% if u_opp_list %}<li><a href="{{ u_opp_list }}" {% if nav == "opportunities" %}aria-current="page"{% endif %}>Opportunities</a></li>{% endif %}
+          {% if u_my_apps %}<li><a href="{{ u_my_apps }}" {% if nav == "applications" %}aria-current="page"{% endif %}>My applications</a></li>{% endif %}
+          {% if u_my_placement %}<li><a href="{{ u_my_placement }}" {% if nav == "placement" %}aria-current="page"{% endif %}>My placement</a></li>{% endif %}
+        {% elif user.role == "COORDINATOR" %}
+          {% if u_queue %}<li><a href="{{ u_queue }}" {% if nav == "queue" %}aria-current="page"{% endif %}>Needs action</a></li>{% endif %}
+          {% if u_opp_review %}<li><a href="{{ u_opp_review }}" {% if nav == "opportunities" %}aria-current="page"{% endif %}>Opportunities</a></li>{% endif %}
+          {% if u_app_review %}<li><a href="{{ u_app_review }}" {% if nav == "applications" %}aria-current="page"{% endif %}>Applications</a></li>{% endif %}
+          {% if u_placements %}<li><a href="{{ u_placements }}" {% if nav == "placements" %}aria-current="page"{% endif %}>Placements</a></li>{% endif %}
+        {% elif user.role == "ORG_REP" %}
+          {% if u_org_opps %}<li><a href="{{ u_org_opps }}" {% if nav == "opportunities" %}aria-current="page"{% endif %}>My opportunities</a></li>{% endif %}
+          {% if u_mentor %}<li><a href="{{ u_mentor }}" {% if nav == "checkins" %}aria-current="page"{% endif %}>Check-ins</a></li>{% endif %}
+        {% endif %}
+        {% if u_notices %}<li><a href="{{ u_notices }}" {% if nav == "notices" %}aria-current="page"{% endif %}>Notices{% if notice_count %} <span>({{ notice_count }} unread)</span>{% endif %}</a></li>{% endif %}
+      </ul>
+    </nav>
+    <div class="userbox">
+      <span>{% firstof user.name user.get_full_name user.email %}{% if user.get_role_display %} ({{ user.get_role_display }}){% endif %}</span>
+      {% if u_logout %}<form method="post" action="{{ u_logout }}">{% csrf_token %}<button class="linkbtn" type="submit">Sign out</button></form>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</header>
+<main id="main" tabindex="-1">
+  {% if messages %}
+  <ul class="messages" role="status">
+    {% for message in messages %}<li class="{{ message.tags }}">{{ message }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>
