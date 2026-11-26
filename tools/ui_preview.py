@@ -55,7 +55,7 @@ urlpatterns = [
 ]
 
 settings.configure(
-    DEBUG=True, ROOT_URLCONF=__name__, USE_TZ=False, SECRET_KEY="preview-only",
+    DEBUG=True, ROOT_URLCONF=__name__, USE_TZ=False, TIME_ZONE="Asia/Kolkata", SECRET_KEY="preview-only",
     INSTALLED_APPS=["django.contrib.staticfiles"], STATIC_URL="../../static/",
     TEMPLATES=[{"BACKEND": "django.template.backends.django.DjangoTemplates",
                 "DIRS": [str(HERE / "templates")],
@@ -130,7 +130,7 @@ placement = NS(pk=21, opportunity=o1, student=student, mentor=rep, start_date=o1
                state="ACTIVE", get_state_display="Active", last_checkin_week=date(2027, 1, 11), is_overdue=False)
 placement2 = NS(pk=22, opportunity=o2, student=student2, mentor=rep, start_date=o2.start_date, end_date=o2.end_date,
                 state="ACTIVE", get_state_display="Active", last_checkin_week=None, is_overdue=True)
-fb = NS(comment="Good progress. Try grouping by month next.", responded_at=now)
+fb = NS(comment="Good progress. Try grouping by month next.", mentor=rep, responded_at=now)
 c1 = NS(pk=31, placement=placement, goal=goals[0], week_start=date(2027, 1, 4),
         accomplishment="Cleaned the sales dataset and removed duplicates.", blocker="",
         next_step="Start the dashboard.", feedback=fb)
@@ -140,8 +140,8 @@ c2 = NS(pk=32, placement=placement, goal=goals[1], week_start=date(2027, 1, 11),
 
 class LoginForm(django.forms.Form):
     """Same field names as Django's AuthenticationForm (username, password); no database needed."""
-    username = django.forms.EmailField(label="University email")
-    password = django.forms.CharField(label="Password", widget=django.forms.PasswordInput)
+    username = django.forms.EmailField(label="University email", widget=django.forms.EmailInput(attrs={"autocomplete": "username"}))
+    password = django.forms.CharField(label="Password", widget=django.forms.PasswordInput(attrs={"autocomplete": "current-password"}))
 
 
 goal_choices = [(g.pk, g.text) for g in goals]

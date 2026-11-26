@@ -7,6 +7,12 @@
   {% include "includes/status.html" with value=application.status label=application.get_status_display %}</p>
 
 <div class="panel">
+  <h2>Mentor for this placement</h2>
+  {% if application.opportunity.mentor %}
+    <p>If you select this student, <strong>{{ application.opportunity.mentor.name }}</strong> ({{ application.opportunity.organization.name }}) is assigned as mentor. This comes from the approved opportunity.</p>
+  {% else %}
+    <p class="error"><strong>No mentor is set on this opportunity.</strong> Ask the organization to add one before selecting a student.</p>
+  {% endif %}
   <h2>Application</h2>
   <p>{{ application.statement|linebreaksbr }}</p>
   <h2>Organization recommendation</h2>

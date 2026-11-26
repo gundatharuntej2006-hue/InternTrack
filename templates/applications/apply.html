@@ -3,7 +3,7 @@
 {% block content %}
 <p><a href="{% url 'opportunities:detail' opportunity.pk %}">&larr; Back to details</a></p>
 <h1>Apply: {{ opportunity.title }}</h1>
-<p class="lead">{{ opportunity.organization.name }} | Apply by {{ opportunity.deadline|date:"j M Y, H:i" }}. You can apply only once.</p>
+<p class="lead">{{ opportunity.organization.name }} | Apply by {{ opportunity.deadline|date:"j M Y, H:i T" }}. You can apply only once.</p>
 
 {% include "includes/form_errors.html" with form=form %}
 <form class="stack" method="post" novalidate>

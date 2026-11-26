@@ -4,9 +4,9 @@
 <p><a href="{% url 'opportunities:org_list' %}">&larr; Back to my opportunities</a></p>
 <h1>{% if opportunity %}Edit: {{ opportunity.title }}{% else %}New opportunity{% endif %}</h1>
 {% if opportunity.state == "RETURNED" %}
-<div class="panel"><strong>Returned by coordinator:</strong> {{ opportunity.return_reason }}</div>
+<div class="panel" role="note"><strong>Returned by the coordinator.</strong> Reason: {{ opportunity.return_reason }}<br>Fix the details below, then submit for review again.</div>
 {% endif %}
-<p class="lead">Save as a draft any time. When you submit, the coordinator reviews it before students can see it.</p>
+<p class="lead">Save draft keeps your work (only the title is needed). Submit for review needs every field; the coordinator then reviews it before students can see it. Times are in IST.</p>
 
 {% include "includes/form_errors.html" with form=form %}
 <form class="stack" method="post" novalidate>

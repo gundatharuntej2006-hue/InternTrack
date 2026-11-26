@@ -11,7 +11,7 @@
     <dl class="facts">
       <dt>Mode</dt><dd>{{ opp.get_mode_display }}{% if opp.location %}, {{ opp.location }}{% endif %}</dd>
       <dt>Dates</dt><dd>{{ opp.start_date|date:"j M Y" }} to {{ opp.end_date|date:"j M Y" }}</dd>
-      <dt>Deadline</dt><dd>{{ opp.deadline|date:"j M Y, H:i" }}</dd>
+      <dt>Deadline</dt><dd>{{ opp.deadline|date:"j M Y, H:i T" }}</dd>
       <dt>Mentor</dt><dd>{{ opp.mentor.name }}</dd>
       <dt>Eligibility</dt><dd>{{ opp.eligibility }}</dd>
       <dt>Description</dt><dd>{{ opp.description|linebreaksbr }}</dd>
@@ -43,7 +43,7 @@
   <tbody>
   {% for opp in published %}
     <tr>
-      <td>{{ opp.title }}</td><td>{{ opp.organization.name }}</td><td>{{ opp.deadline|date:"j M Y, H:i" }}</td>
+      <td>{{ opp.title }}</td><td>{{ opp.organization.name }}</td><td>{{ opp.deadline|date:"j M Y, H:i T" }}</td>
       <td>
         <form method="post" action="{% url 'opportunities:close' opp.pk %}">{% csrf_token %}
           <label class="visually-hidden" for="close-{{ opp.pk }}">Reason for closing {{ opp.title }}</label>

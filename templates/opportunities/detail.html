@@ -8,7 +8,7 @@
 <dl class="facts">
   <dt>Mode</dt><dd>{{ opportunity.get_mode_display }}{% if opportunity.location %}, {{ opportunity.location }}{% endif %}</dd>
   <dt>Dates</dt><dd>{{ opportunity.start_date|date:"j M Y" }} to {{ opportunity.end_date|date:"j M Y" }}</dd>
-  <dt>Apply by</dt><dd><time datetime="{{ opportunity.deadline|date:'c' }}">{{ opportunity.deadline|date:"j M Y, H:i" }}</time></dd>
+  <dt>Apply by</dt><dd><time datetime="{{ opportunity.deadline|date:'c' }}">{{ opportunity.deadline|date:"j M Y, H:i T" }}</time></dd>
 </dl>
 
 <h2>Description</h2>

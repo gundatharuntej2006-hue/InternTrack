@@ -10,10 +10,10 @@
   <tbody>
   {% for opp in opportunities %}
     <tr>
-      <td>{{ opp.title }}</td>
+      <td>{% if opp.state == "DRAFT" or opp.state == "RETURNED" %}<a href="{% url 'opportunities:edit' opp.pk %}">{{ opp.title }}</a>{% else %}{{ opp.title }}{% endif %}</td>
       <td>{% include "includes/status.html" with value=opp.state label=opp.get_state_display %}
-        {% if opp.state == "RETURNED" and opp.return_reason %}<br><span class="meta">Coordinator: {{ opp.return_reason }}</span>{% endif %}</td>
-      <td>{{ opp.deadline|date:"j M Y" }}</td>
+        {% if opp.state == "RETURNED" and opp.return_reason %}<br><span class="meta">Returned because: {{ opp.return_reason }}</span>{% endif %}</td>
+      <td>{{ opp.deadline|date:"j M Y, H:i T" }}</td>
       <td>{% if opp.applicant_count %}<a href="{% url 'applications:applicants' opp.pk %}">{{ opp.applicant_count }}<span class="visually-hidden"> applicants for {{ opp.title }}</span></a>{% else %}0{% endif %}</td>
       <td>{% if opp.state == "DRAFT" or opp.state == "RETURNED" %}<a class="btn" href="{% url 'opportunities:edit' opp.pk %}">Edit<span class="visually-hidden"> {{ opp.title }}</span></a>{% endif %}</td>
     </tr>

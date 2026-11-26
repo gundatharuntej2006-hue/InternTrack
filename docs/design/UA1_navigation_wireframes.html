@@ -143,8 +143,8 @@ table.t th{background:var(--fill2)}
   <section class="screen" id="S1"><div class="cap">S1 Opportunity list <i>Student</i></div><div class="app">
     <div class="bar"><span class="logo">InternTrack</span><span class="links">Opportunities | My applications | My placement | Notices (2)</span></div>
     <div class="row"><div class="field" style="flex:1">Search title / organization</div><div class="field">Mode ▾</div><div class="field">Location ▾</div></div>
-    <div class="box"><b>Data Analyst Intern</b> - Org A<br><span class="small">Remote | Eligibility: 3rd year+ | Deadline: 30 Nov</span><br><a class="btn" href="#S2">View details</a></div>
-    <div class="box"><b>Web Developer Intern</b> - Org B<br><span class="small">On-site | Eligibility: CS/AIML | Deadline: 5 Dec</span><br><a class="btn" href="#S2">View details</a></div>
+    <div class="box"><b>Data Analyst Intern</b> - Org A<br><span class="small">Remote | Eligibility: 3rd year+ | Apply by: 30 Nov 2026, 17:00 IST</span><br><a class="btn" href="#S2">View details</a></div>
+    <div class="box"><b>Web Developer Intern</b> - Org B<br><span class="small">On-site | Eligibility: CS/AIML | Apply by: 5 Dec 2026, 17:00 IST</span><br><a class="btn" href="#S2">View details</a></div>
     <div class="empty">Empty state: "No published opportunities match your filters."</div>
     <span class="next">Prototype next → <a href="#S2">S2 Opportunity detail</a></span>
   </div></section>
@@ -152,7 +152,7 @@ table.t th{background:var(--fill2)}
   <section class="screen" id="S2"><div class="cap">S2 Opportunity detail <i>Student</i></div><div class="app">
     <div class="bar"><span class="logo">InternTrack</span><span class="links">← Back to list</span></div>
     <b>Data Analyst Intern</b> - Org A
-    <div class="box small">Description: what the intern will do ...<br>Eligibility: 3rd year+, Python basics<br>Mode/location: Remote<br>Dates: 1 Jan - 31 Mar | Deadline: 30 Nov</div>
+    <div class="box small">Description: what the intern will do ...<br>Eligibility: 3rd year+, Python basics<br>Mode/location: Remote<br>Dates: 1 Jan - 31 Mar | Apply by: 30 Nov 2026, 17:00 IST (applications close at this exact time)</div>
     <a class="btn pri" href="#S3">Apply</a>
     <div class="err">If already applied: "You applied on 20 Nov - see My applications." (Apply button hidden)</div>
     <span class="next">Prototype next → <a href="#S3">S3 Apply form</a></span>
@@ -164,7 +164,7 @@ table.t th{background:var(--fill2)}
     <div class="lbl">Eligibility answers</div><div class="field">Year of study ▾</div><div class="field">Relevant skills</div>
     <div class="row"><a class="btn pri" href="#S4">Submit application</a><a class="btn" href="#S2">Cancel</a></div>
     <div class="err">Duplicate: "You have already applied to this opportunity."</div>
-    <div class="err">Late: "The deadline (30 Nov) has passed. Applications are closed."</div>
+    <div class="err">Late: "The deadline (30 Nov 2026, 17:00 IST) has passed. Applications are closed."</div>
     <span class="next">Prototype next → <a href="#O3">O3 Rep recommends</a></span>
   </div></section>
 
@@ -189,9 +189,10 @@ table.t th{background:var(--fill2)}
     <div class="lbl">Learning goals</div>
     <div class="box small">G1 Clean and explore a real dataset<br>G2 Build one dashboard<br>G3 Present findings to the team</div>
     <div class="lbl">Weekly check-ins</div>
-    <table class="t"><tr><th>Week</th><th>Goal</th><th>Status</th></tr>
-      <tr><td>5 Jan</td><td>G1</td><td>Mentor replied</td></tr>
+    <table class="t"><tr><th>Week</th><th>Goal</th><th>Mentor feedback</th></tr>
+      <tr><td>5 Jan</td><td>G1</td><td>"Good progress, try grouping by month next."<br><span class="small">Mentor name, 7 Jan</span></td></tr>
       <tr><td>12 Jan</td><td>-</td><td><b>Not submitted</b></td></tr></table>
+    <p class="small">When the placement is Completed this page stays readable (goals, check-ins, feedback); the submit button is hidden.</p>
     <a class="btn pri" href="#S6">Submit this week's check-in</a>
     <span class="next">Prototype next → <a href="#S6">S6 Weekly check-in</a></span>
   </div></section>
@@ -231,6 +232,9 @@ table.t th{background:var(--fill2)}
       <div class="lbl">Comment to organization (required if returned)</div><div class="field">...</div>
       <div class="row"><a class="btn pri" href="#S1">Approve and publish</a><a class="btn" href="#O1">Return with comment</a></div>
     </div>
+    <div class="lbl">Published opportunities</div>
+    <table class="t"><tr><th>Title</th><th>Deadline</th><th></th></tr>
+      <tr><td>Web Developer Intern - Org B</td><td>5 Dec 2026, 17:00 IST</td><td><a class="btn">Close</a></td></tr></table>
     <span class="next">Prototype next → <a href="#S1">S1 Student sees it listed</a></span>
   </div></section>
 
@@ -245,13 +249,14 @@ table.t th{background:var(--fill2)}
 
   <section class="screen" id="C4"><div class="cap">C4 Decision form <i>Coordinator</i></div><div class="app">
     <div class="bar"><span class="logo">InternTrack</span><span class="links">Student A → Data Analyst Intern</span></div>
+    <div class="box small">Mentor if selected: <b>Mentor name (Org A)</b>, taken from the approved opportunity</div>
     <div class="lbl">New status</div><div class="field">Selected ▾ (Under Review / Shortlisted / Selected / Declined)</div>
     <div class="lbl">Public reason (student sees this)</div><div class="field">...</div>
     <div class="lbl">Next step for student</div><div class="field">...</div>
     <div class="lbl">Internal note (never shown to student)</div><div class="field">...</div>
     <div class="lbl">Learning goals (2-3, only when Selected)</div><div class="field">G1 ...</div><div class="field">G2 ...</div><div class="field">G3 (optional)</div>
     <a class="btn pri" href="#S4">Confirm decision</a>
-    <div class="err">"Student already has an active placement" / "This application was already decided."</div>
+    <div class="err">"Student already has an active placement" / "This application was already decided." / "No mentor is set on this opportunity. Ask the organization to add one before selecting."</div>
     <span class="next">Prototype next → <a href="#S4">S4 Student sees status trail</a></span>
   </div></section>
 
@@ -272,19 +277,22 @@ table.t th{background:var(--fill2)}
     <a class="btn pri" href="#O2">+ New opportunity</a>
     <table class="t"><tr><th>Title</th><th>State</th><th>Applicants</th></tr>
       <tr><td>Data Analyst Intern</td><td>Published</td><td><a href="#O3">4</a></td></tr>
-      <tr><td>Web Developer Intern</td><td>Returned - see comment</td><td>-</td></tr>
-      <tr><td>ML Intern</td><td>Draft</td><td>-</td></tr></table>
+      <tr><td><a href="#O2">Web Developer Intern</a></td><td>Returned<br><span class="small">Returned because: "Add the stipend and exact dates."</span></td><td>-</td></tr>
+      <tr><td><a href="#O2">ML Intern</a></td><td>Draft</td><td>-</td></tr></table>
+    <p class="small">Draft and Returned titles open O2 to edit and resubmit.</p>
   </div></section>
 
   <section class="screen" id="O2"><div class="cap">O2 Draft opportunity form <i>Rep</i></div><div class="app">
     <div class="bar"><span class="logo">InternTrack</span><span class="links">New opportunity</span></div>
+    <div class="box small">(Returned only) Returned by the coordinator. Reason: "Add the stipend and exact dates." Fix below, then submit again.</div>
     <div class="lbl">Title</div><div class="field">...</div>
     <div class="lbl">Description</div><div class="field tall">...</div>
     <div class="lbl">Eligibility</div><div class="field">...</div>
     <div class="row"><div><div class="lbl">Mode</div><div class="field">Remote ▾</div></div><div><div class="lbl">Location</div><div class="field">...</div></div></div>
-    <div class="row"><div><div class="lbl">Start / end</div><div class="field">dd/mm - dd/mm</div></div><div><div class="lbl">Deadline</div><div class="field">dd/mm</div></div></div>
+    <div class="row"><div><div class="lbl">Start / end</div><div class="field">dd/mm - dd/mm</div></div><div><div class="lbl">Deadline (date + time, IST)</div><div class="field">dd/mm/yyyy, hh:mm</div></div></div>
     <div class="lbl">Mentor</div><div class="field">Select mentor ▾</div>
-    <div class="row"><a class="btn">Save draft</a><a class="btn pri" href="#C2">Submit for review</a></div>
+    <div class="row"><a class="btn" href="#O1">Save draft</a><a class="btn pri" href="#C2">Submit for review</a></div>
+    <p class="small">Save draft needs only the title (back to O1, state Draft). Submit for review needs every field; missing fields show errors and it stays Draft/Returned.</p>
     <span class="next">Prototype next → <a href="#C2">C2 Coordinator approves</a></span>
   </div></section>
 

@@ -5,6 +5,7 @@ When the real models exist, the ModelForm versions should keep the same field na
 Ownership fields (student, organization, actor) are never form fields: views set them from request.user.
 """
 from django import forms
+from django.utils import timezone
 
 MODE_CHOICES = [("REMOTE", "Remote"), ("ONSITE", "On-site"), ("HYBRID", "Hybrid")]
 APPLICATION_STATUS_CHOICES = [
@@ -28,23 +29,41 @@ class OpportunityFilterForm(forms.Form):
 
 
 class OpportunityForm(forms.Form):
+    """Create/edit an opportunity (O2).
+
+    "Save draft" only needs a title, so a rep can save partial work and come back.
+    "Submit for review" needs every field. Pass submitting=True when the POST has
+    action=submit; on errors the opportunity stays in Draft/Returned.
+    """
+
+    REQUIRED_TO_SUBMIT = ("description", "eligibility", "start_date", "end_date", "deadline", "mentor")
+
     title = forms.CharField(max_length=150)
-    description = forms.CharField(widget=forms.Textarea)
-    eligibility = forms.CharField(widget=forms.Textarea, help_text="Who can apply, for example year and skills")
+    description = forms.CharField(widget=forms.Textarea, required=False)
+    eligibility = forms.CharField(widget=forms.Textarea, required=False,
+                                  help_text="Who can apply, for example year and skills")
     mode = forms.ChoiceField(choices=MODE_CHOICES)
     location = forms.CharField(max_length=150, required=False, help_text="Required unless Remote")
-    start_date = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}))
-    end_date = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}))
-    deadline = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
-                                   help_text="Applications close at this time")
-    mentor = forms.ChoiceField(choices=[], help_text="A representative of your organization")
+    start_date = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}), required=False)
+    end_date = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}), required=False)
+    deadline = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"type": "datetime-local"}), required=False,
+                                   help_text="Date and time in IST (India, UTC+5:30). Applications close at this exact time.")
+    mentor = forms.ChoiceField(choices=[], required=False, help_text="A representative of your organization")
 
-    def __init__(self, *args, mentor_choices=(), **kwargs):
+    def __init__(self, *args, mentor_choices=(), submitting=False, **kwargs):
         super().__init__(*args, **kwargs)
+        self.submitting = submitting
         self.fields["mentor"].choices = [("", "Choose...")] + list(mentor_choices)
 
     def clean(self):
         data = super().clean()
+        if self.submitting:
+            for name in self.REQUIRED_TO_SUBMIT:
+                if not data.get(name) and name not in self.errors:
+                    self.add_error(name, "Required before you submit for review.")
+            deadline = data.get("deadline")
+            if deadline and deadline <= timezone.now():
+                self.add_error("deadline", "The deadline must be in the future.")
         if data.get("start_date") and data.get("end_date") and data["start_date"] > data["end_date"]:
             self.add_error("end_date", "End date must be on or after the start date.")
         if data.get("mode") in ("ONSITE", "HYBRID") and not data.get("location"):

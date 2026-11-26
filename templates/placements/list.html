@@ -3,7 +3,7 @@
 {% block content %}
 <h1>Placements</h1>
 <form class="filters" method="get">
-  <div class="field"><label><input type="checkbox" name="overdue" value="1" {% if overdue_only %}checked{% endif %} style="width:auto"> Show overdue only</label></div>
+  <div class="field"><label><input type="checkbox" name="overdue" value="1" {% if overdue_only %}checked{% endif %} > Show overdue only</label></div>
   <button class="btn" type="submit">Apply</button>
 </form>
 {% if placements %}

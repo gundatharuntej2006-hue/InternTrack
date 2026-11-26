@@ -21,7 +21,10 @@ a{color:var(--brand)}
 .mainnav a[aria-current="page"]{text-decoration:underline;text-underline-offset:4px;font-weight:700}
 .userbox{display:flex;gap:12px;align-items:center;font-size:.9rem}
 .userbox form{margin:0}
-.linkbtn{background:none;border:0;color:#fff;text-decoration:underline;cursor:pointer;font:inherit;padding:0}
+.linkbtn{background:none;border:0;color:#fff;text-decoration:underline;cursor:pointer;font:inherit;padding:2px 4px;min-height:24px}
+/* WCAG 2.2 target size: every control at least 24x24px */
+input,select,button,textarea{min-height:24px}
+input[type=checkbox],input[type=radio],.field input[type=checkbox],.field input[type=radio]{width:24px;height:24px;margin:0 6px 0 0;vertical-align:middle}
 
 main{max-width:1100px;margin:0 auto;padding:20px 16px 48px}
 h1{font-size:1.6rem;margin:0 0 12px}

@@ -17,57 +17,70 @@
 </head>
 <body>
 <h1>UA-6 Accessibility checklist and test results</h1>
-<p class="meta">InternTrack · Jira KAN-49 · Target: WCAG 2.1 AA · Tested 25 Nov 2026 on the 20 template previews (student, coordinator, org rep/mentor)</p>
+<p class="meta">InternTrack · Jira KAN-49 · Target: <strong>WCAG 2.2 AA</strong> · v2, 27 Nov 2026 · Tested on the 20 template previews (student, coordinator, org rep/mentor) rendered with sample data</p>
+
+<h2>Scope of this evidence</h2>
+<p>These results come from the real Django templates and CSS, rendered with sample data through <code>tools/ui_preview.py</code>. The backend views are not merged into <code>main</code> yet, so the running app, the NVDA screen reader pass and real user data are <strong>not</strong> covered. Those are listed under "Not yet tested" below.</p>
 
 <h2>Summary</h2>
 <table aria-label="Summary">
 <tr><th scope="col">Area</th><th scope="col">Result</th></tr>
-<tr><td>Automated page checks (20 pages)</td><td><span class="pass">20/20 pass</span> after 3 fixes</td></tr>
-<tr><td>Colour contrast (11 colour pairs)</td><td><span class="pass">11/11 pass</span> after 1 fix</td></tr>
-<tr><td>Phone width 320px, no sideways scroll (19 pages)</td><td><span class="pass">19/19 pass</span> after 1 fix</td></tr>
-<tr><td>Keyboard: skip link first, visible focus</td><td><span class="pass">Pass</span></td></tr>
-<tr><td>Form errors announced</td><td><span class="pass">Pass</span> (error summary <code>role="alert"</code>, links to fields, <code>aria-invalid</code>)</td></tr>
-<tr><td>Re-test on the running app with real data</td><td><span class="todo">After backend views are merged</span></td></tr>
+<tr><td>Automated page checks (20 pages)</td><td><span class="pass">20/20 pass</span></td></tr>
+<tr><td>Colour contrast (11 colour pairs)</td><td><span class="pass">11/11 pass</span></td></tr>
+<tr><td>Target size at least 24×24px (WCAG 2.2, 2.5.8), 20 pages</td><td><span class="pass">20/20 pass</span> after fix</td></tr>
+<tr><td>Reflow at 320px (phone), no sideways scroll</td><td><span class="pass">20/20 pass</span></td></tr>
+<tr><td>200% zoom (1280px screen at 200% = 640px), no sideways scroll</td><td><span class="pass">20/20 pass</span></td></tr>
+<tr><td>Keyboard: skip link first, visible focus, focus never hidden</td><td><span class="pass">Pass</span></td></tr>
+<tr><td>Form errors announced</td><td><span class="pass">Pass</span></td></tr>
+<tr><td>Running app with real data, NVDA screen reader</td><td><span class="todo">Not yet tested</span> (backend not merged)</td></tr>
 </table>
 
 <h2>Checklist and results</h2>
 <table aria-label="Checklist">
-<tr><th scope="col">#</th><th scope="col">Check</th><th scope="col">How tested</th><th scope="col">Result</th></tr>
-<tr><td>1</td><td>Page language set (<code>&lt;html lang="en"&gt;</code>)</td><td>Script</td><td class="pass">Pass</td></tr>
-<tr><td>2</td><td>Every page has a unique, descriptive title</td><td>Script</td><td class="pass">Pass</td></tr>
-<tr><td>3</td><td>Skip link to main content, first item on Tab</td><td>Browser, Tab key</td><td class="pass">Pass</td></tr>
-<tr><td>4</td><td>Landmarks: header, nav with label, main</td><td>Script</td><td class="pass">Pass</td></tr>
-<tr><td>5</td><td>Exactly one h1, no skipped heading levels</td><td>Script</td><td class="pass">Pass</td></tr>
-<tr><td>6</td><td>Current menu item marked with <code>aria-current="page"</code></td><td>Template review</td><td class="pass">Pass</td></tr>
-<tr><td>7</td><td>Every form field has a visible label; required fields say "(required)" to screen readers</td><td>Script</td><td class="pass">Pass</td></tr>
-<tr><td>8</td><td>Help text linked to its field (<code>aria-describedby</code>)</td><td>Script</td><td class="fixed">Fixed</td></tr>
-<tr><td>9</td><td>Errors: summary at top with links, message next to each field, field marked invalid</td><td>Browser on error page</td><td class="pass">Pass</td></tr>
-<tr><td>10</td><td>Buttons and links have clear text (no "click here")</td><td>Script</td><td class="pass">Pass</td></tr>
-<tr><td>11</td><td>Data tables have header cells with scope and a name</td><td>Script</td><td class="fixed">Fixed</td></tr>
-<tr><td>12</td><td>Status is shown as text, not colour only</td><td>Template review</td><td class="pass">Pass</td></tr>
-<tr><td>13</td><td>Text contrast at least 4.5:1, borders and focus at least 3:1</td><td>Script (WCAG formula)</td><td class="fixed">Fixed</td></tr>
-<tr><td>14</td><td>Visible keyboard focus on every control (3px outline)</td><td>Browser</td><td class="pass">Pass</td></tr>
-<tr><td>15</td><td>Works at 320px width without sideways scrolling; wide tables scroll inside their box</td><td>Browser at 320px</td><td class="fixed">Fixed</td></tr>
-<tr><td>16</td><td>No duplicate ids on a page</td><td>Script</td><td class="pass">Pass</td></tr>
+<tr><th scope="col">#</th><th scope="col">Check (WCAG criterion)</th><th scope="col">How tested</th><th scope="col">Result</th></tr>
+<tr><td>1</td><td>Page language set (3.1.1)</td><td>Script</td><td class="pass">Pass</td></tr>
+<tr><td>2</td><td>Every page has a descriptive title (2.4.2)</td><td>Script</td><td class="pass">Pass</td></tr>
+<tr><td>3</td><td>Skip link to main content, first item on Tab (2.4.1)</td><td>Browser, Tab key</td><td class="pass">Pass</td></tr>
+<tr><td>4</td><td>Landmarks: header, labelled nav, main (1.3.1)</td><td>Script</td><td class="pass">Pass</td></tr>
+<tr><td>5</td><td>Exactly one h1, no skipped heading levels (1.3.1, 2.4.6)</td><td>Script</td><td class="pass">Pass</td></tr>
+<tr><td>6</td><td>Current menu item marked with <code>aria-current="page"</code> (consistent navigation, 3.2.3)</td><td>Template review</td><td class="pass">Pass</td></tr>
+<tr><td>7</td><td>Every form field has a visible label; required fields say "(required)" (1.3.1, 3.3.2)</td><td>Script</td><td class="pass">Pass</td></tr>
+<tr><td>8</td><td>Help text linked to its field (<code>aria-describedby</code>) (1.3.1)</td><td>Script</td><td class="fixed">Fixed</td></tr>
+<tr><td>9</td><td>Errors: summary with links, message next to each field, field marked invalid (3.3.1, 3.3.3, 4.1.3)</td><td>Browser on error page</td><td class="pass">Pass</td></tr>
+<tr><td>10</td><td>Buttons and links have clear text (2.4.4, 4.1.2)</td><td>Script</td><td class="pass">Pass</td></tr>
+<tr><td>11</td><td>Data tables have header cells with scope and a name (1.3.1)</td><td>Script</td><td class="fixed">Fixed</td></tr>
+<tr><td>12</td><td>Status shown as text, not colour only (1.4.1)</td><td>Template review</td><td class="pass">Pass</td></tr>
+<tr><td>13</td><td>Text contrast ≥ 4.5:1; borders and focus ≥ 3:1 (1.4.3, 1.4.11)</td><td>Script (WCAG formula)</td><td class="fixed">Fixed</td></tr>
+<tr><td>14</td><td>Visible keyboard focus on every control (2.4.7)</td><td>Browser</td><td class="pass">Pass</td></tr>
+<tr><td>15</td><td><strong>2.2:</strong> Focus not obscured, no sticky or fixed bars covering focus (2.4.11)</td><td>Script (CSS)</td><td class="pass">Pass</td></tr>
+<tr><td>16</td><td>Reflow at 320px without sideways scrolling (1.4.10)</td><td>Browser at 320px</td><td class="fixed">Fixed</td></tr>
+<tr><td>17</td><td>200% zoom without loss of content (1.4.4)</td><td>Browser at 640px (= 200%)</td><td class="pass">Pass</td></tr>
+<tr><td>18</td><td><strong>2.2:</strong> Target size at least 24×24px (2.5.8)</td><td>Browser, every control measured</td><td class="fixed">Fixed</td></tr>
+<tr><td>19</td><td><strong>2.2:</strong> Accessible authentication: no puzzle or CAPTCHA; password managers can fill login (<code>autocomplete</code>) (3.3.8)</td><td>Script + review</td><td class="pass">Pass</td></tr>
+<tr><td>20</td><td><strong>2.2:</strong> Redundant entry: forms keep entered values after errors; nothing is asked twice (3.3.7)</td><td>Review (Django bound forms)</td><td class="pass">Pass</td></tr>
+<tr><td>21</td><td><strong>2.2:</strong> Consistent help, same menu and sign-out position on every page (3.2.6)</td><td>Review (one base.html)</td><td class="pass">Pass</td></tr>
+<tr><td>22</td><td><strong>2.2:</strong> Dragging movements: none used (2.5.7)</td><td>Review</td><td class="pass">N/A</td></tr>
+<tr><td>23</td><td>No duplicate ids on a page</td><td>Script</td><td class="pass">Pass</td></tr>
 </table>
 
 <h2>Problems found and fixed</h2>
 <table aria-label="Fixes">
 <tr><th scope="col">Problem</th><th scope="col">Pages</th><th scope="col">Fix</th></tr>
-<tr><td>Help text id did not match the <code>aria-describedby</code> Django adds, so screen readers skipped the hint</td><td>Opportunity filter, apply, create opportunity (5 pages)</td><td><code>templates/includes/field.html</code>: help text id is now <code>&lt;id&gt;_helptext</code></td></tr>
-<tr><td>Tables had no accessible name</td><td>6 tables</td><td>Added <code>aria-label</code> (e.g. "Applications", "Placements")</td></tr>
-<tr><td>Blue focus ring on the dark top bar was 2.75:1 (needs 3:1)</td><td>All pages (menu)</td><td><code>app.css</code>: white focus ring inside the top bar (14.2:1)</td></tr>
-<tr><td>Hidden screen-reader text inside tables made the whole page scroll sideways on phones</td><td>Applications, placements, my opportunities</td><td><code>app.css</code>: <code>.tablewrap</code> now contains its content</td></tr>
+<tr><td>Help text id did not match the <code>aria-describedby</code> that Django adds, so screen readers skipped the hint</td><td>Filters, apply, opportunity form</td><td><code>includes/field.html</code>: id is now <code>&lt;id&gt;_helptext</code></td></tr>
+<tr><td>Tables had no accessible name</td><td>6 tables</td><td>Added <code>aria-label</code> or caption</td></tr>
+<tr><td>Blue focus ring on the dark top bar was 2.75:1 (needs 3:1)</td><td>All pages</td><td>White focus ring in the top bar (14.2:1)</td></tr>
+<tr><td>Hidden screen-reader text in tables made pages scroll sideways on phones</td><td>3 table pages</td><td><code>.tablewrap</code> contains its content</td></tr>
+<tr><td>Targets under 24px: Sign out (22px high), reason boxes (21px), overdue checkbox (13px)</td><td>All pages, C2, C5</td><td>Minimum 24px on all controls; checkbox 24×24px</td></tr>
 </table>
 
 <h2>How to re-run</h2>
-<p><code>python tools/ui_preview.py</code> then <code>python tools/a11y_check.py</code>. The script exits with an error if any check fails, so it can be added to CI.</p>
+<p><code>python tools/ui_preview.py</code>, then <code>python tools/a11y_check.py</code> (page checks, contrast, focus-not-obscured). The script exits with an error if any check fails. Target size, reflow and zoom were measured in Chromium (Playwright) at 1280px, 640px and 320px widths.</p>
 
-<h2>Still to do on the running app</h2>
+<h2>Not yet tested (needs the running app)</h2>
 <ul>
-  <li>Repeat checks 3, 9, 14 and 15 on the real pages once the backend views are merged.</li>
-  <li>Quick screen reader pass (NVDA on Windows) on the demo path: login → browse → apply → coordinator decision → check-in.</li>
-  <li>Check pages at 200% browser zoom.</li>
+  <li>Repeat keyboard, error, reflow and target-size checks on the real pages once the backend views are merged.</li>
+  <li>NVDA screen reader pass on the apply and check-in flows (KAN-49 item 2).</li>
+  <li>Dynamic messages after actions (success notices) read out by NVDA.</li>
 </ul>
 </body>
 </html>

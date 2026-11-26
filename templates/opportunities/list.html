@@ -20,7 +20,7 @@
     <h2><a href="{% url 'opportunities:detail' opp.pk %}">{{ opp.title }}</a></h2>
     <p class="meta">{{ opp.organization.name }} | {{ opp.get_mode_display }}{% if opp.location %}, {{ opp.location }}{% endif %}</p>
     <p class="meta"><strong>Eligibility:</strong> {{ opp.eligibility|truncatechars:120 }}</p>
-    <p class="meta"><strong>Apply by:</strong> <time datetime="{{ opp.deadline|date:'c' }}">{{ opp.deadline|date:"j M Y, H:i" }}</time></p>
+    <p class="meta"><strong>Apply by:</strong> <time datetime="{{ opp.deadline|date:'c' }}">{{ opp.deadline|date:"j M Y, H:i T" }}</time></p>
   </li>
   {% endfor %}
 </ul>

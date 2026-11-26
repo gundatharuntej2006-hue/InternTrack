@@ -177,7 +177,7 @@ erDiagram
 <div class="card"><h3>D5 Notification</h3><table>
 <tr><th>Field</th><th>Type</th><th>Rule</th></tr>
 <tr><td>recipient</td><td>FK User</td><td>CASCADE</td></tr>
-<tr><td>event_type</td><td>CharField enum</td><td>OPP_PUBLISHED / OPP_RETURNED / STATUS_CHANGED / PLACEMENT_CREATED / FEEDBACK_ADDED / RECOMMENDATION_ADDED</td></tr>
+<tr><td>event_type</td><td>CharField enum</td><td>OPP_SUBMITTED / OPP_PUBLISHED / OPP_RETURNED / APP_SUBMITTED / RECOMMENDATION_ADDED / STATUS_CHANGED / PLACEMENT_CREATED / FEEDBACK_ADDED (same list as UA-3 section 7)</td></tr>
 <tr><td>object_type, object_id</td><td>CharField / BigInt</td><td>link target</td></tr>
 <tr><td>created_at, read_at</td><td>DateTime / DateTime null</td><td>null = unread</td></tr>
 </table><div class="rule">Generic text only ("Your application status changed"), no private content.</div></div>

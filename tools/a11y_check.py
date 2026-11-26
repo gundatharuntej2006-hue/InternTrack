@@ -120,6 +120,15 @@ def check_page(path):
         if not fs.find("legend"):
             problems.append("fieldset without legend")
 
+    # WCAG 2.2 3.3.8 Accessible Authentication: password managers must be able to fill the login form.
+    password = soup.find("input", attrs={"type": "password"})
+    if password:
+        if password.get("autocomplete") != "current-password":
+            problems.append("password field missing autocomplete=current-password")
+        user = soup.find("input", attrs={"name": "username"})
+        if user is not None and user.get("autocomplete") != "username":
+            problems.append("login field missing autocomplete=username")
+
     summary = soup.find(class_="errorsummary")
     if summary and not (summary.get("role") == "alert" or summary.get("tabindex")):
         problems.append("error summary is not announced (role=alert or focus)")
@@ -148,6 +157,12 @@ def main():
         ok = ratio >= need
         failed += not ok
         print(f"{'PASS' if ok else 'FAIL'}  {ratio:5.2f}:1 (needs {need}:1)  {name}")
+
+    print("\n== Focus not obscured (WCAG 2.2 2.4.11) ==")
+    css = (ROOT / "static" / "css" / "app.css").read_text(encoding="utf-8")
+    sticky = re.search(r"position\s*:\s*(sticky|fixed)", css)
+    failed += bool(sticky)
+    print(f"{'FAIL' if sticky else 'PASS'}  no sticky/fixed bars that could cover the focused element")
 
     print(f"\n{len(pages)} pages checked, {failed} failing item(s).")
     sys.exit(1 if failed else 0)

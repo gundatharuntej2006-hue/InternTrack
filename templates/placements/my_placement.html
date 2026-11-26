@@ -24,11 +24,13 @@
   {% else %}
   <p class="meta">Check-in for the week of {{ this_week|date:"j M" }} is already submitted.</p>
   {% endif %}
+{% else %}
+  <p class="meta">This placement is completed. Your goals, check-ins and mentor feedback stay here to read.</p>
 {% endif %}
 
 {% if checkins %}
 <div class="tablewrap">
-<table class="data" aria-label="My check-ins">
+<table class="data">
   <caption>Your check-ins and mentor feedback</caption>
   <thead><tr><th scope="col">Week of</th><th scope="col">Goal</th><th scope="col">What I did</th><th scope="col">Mentor feedback</th></tr></thead>
   <tbody>
@@ -37,7 +39,7 @@
       <td>{{ c.week_start|date:"j M Y" }}</td>
       <td>{{ c.goal.text|truncatechars:40 }}</td>
       <td>{{ c.accomplishment|truncatechars:80 }}</td>
-      <td>{% if c.feedback %}{{ c.feedback.comment }}{% else %}<em>Waiting for mentor</em>{% endif %}</td>
+      <td>{% if c.feedback %}{{ c.feedback.comment }}<br><span class="meta">{{ c.feedback.mentor.name }}, <time datetime="{{ c.feedback.responded_at|date:'c' }}">{{ c.feedback.responded_at|date:"j M Y" }}</time></span>{% else %}<em>Waiting for mentor</em>{% endif %}</td>
     </tr>
   {% endfor %}
   </tbody>
