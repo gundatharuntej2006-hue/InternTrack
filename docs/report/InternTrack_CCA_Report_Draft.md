@@ -89,10 +89,21 @@ Add asset, library and diagram references when final technical material is inser
 
 ## Design and verification evidence
 
-Atul’s PR #3 delivered 20 templates, shared CSS, forms and design contracts. Its source documents are under docs/design on the atul branch. At the last check PR #3 remained open. The 25 November accessibility report records 20/20 automated template checks, 11/11 contrast pairs and 19/19 mobile previews passing. These results are reported by Atul. Running-app retesting, NVDA and 200% zoom remain pending. Clarify the report’s WCAG 2.1 AA target against KAN-49’s 2.2 AA target before final submission.
+Atul’s PR #3 delivered 20 templates, shared CSS, forms and design contracts. Its source documents are under docs/design on the atul branch. At the last check PR #3 remained open. The updated 27 November accessibility report v2 targets WCAG 2.2 AA. Atul reports 20/20 template previews passing page, target-size, reflow and zoom checks and 11/11 contrast pairs passing. Running-app retesting and NVDA remain pending.
 
 Kunal’s 24 November update reports PR #1 merged into main and 30 local tests with passing push/PR CI for follow-up commit 02050cfd6441305098f77d63ed283a3c0d00d3d0. PR #2 was open at that check. Integrated acceptance remains unverified in the reviewed evidence.
 
 ## Final editorial gate
 
 Before export, insert the agreed process-model justification and final design figures, confirm technical evidence and citations, update the conclusion, and remove all unresolved editorial placeholders. Keep assumptions and known limitations visible. Submission cutoff, channel, required file naming and presentation time require instructor confirmation.
+
+
+## Accessibility and design clarification received 28 November 2026
+
+Atul’s updated UA6 report v2 is dated 27 November and targets WCAG 2.2 AA, correcting the v1 label. It reports 20/20 template pages passing automated checks, target-size checks, 320px reflow and 200% zoom checks, plus 11/11 contrast pairs. Three undersized controls were fixed. Running-app checks, NVDA apply/check-in flows and dynamic message announcements remain pending. These are author-reported preview results, inspected as documentary evidence.
+
+Source: https://github.com/gundatharuntej2006-hue/InternTrack/blob/atul/docs/design/UA6_accessibility.html
+
+Atul reports all six design findings and the completed-placement view fixed on atul/PR #3. Kunal’s re-check remains pending. Architecture/deployment are in UA3 sections 1–2; Atul reports four sequence diagrams in section 8. His schema document supplies 12-table data dictionary source material.
+
+Atul states DFD 0/1/2 belong to Member 2 under the role plan. This ownership is unverified: KAN-7 has no description and the user's established scope is project management/documentation. Obtain the role-plan reference before allocating diagram authoring. KAN-20 is the reported Level 0 draft source.
